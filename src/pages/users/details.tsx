@@ -25,7 +25,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { usersService } from '@/lib/users'
-import { attendanceService } from '@/lib/attendance'
+import { attendanceService, type Attendance } from '@/lib/attendance'
 import { analyticsService } from '@/lib/analytics'
 import { formatDate, getInitials } from '@/lib/utils'
 
@@ -68,12 +68,10 @@ export function UserDetailsPage() {
         return { label: 'Active', variant: 'success' as const }
     }
 
-    const getStatusBadge = (status: string) => {
-        if (status === 'attended') return <Badge className="bg-green-500">Attended</Badge>
-        if (status === 'missed') return <Badge variant="destructive">Missed</Badge>
-        if (status === 'late') return <Badge className="bg-amber-500">Late</Badge>
-        if (status === 'left_early') return <Badge className="bg-orange-500">Left Early</Badge>
-        return <Badge variant="secondary">{status}</Badge>
+    const getStatusBadge = (attendance: Attendance) => {
+        if (attendance.attended_fully) return <Badge className="bg-green-500">Attended</Badge>
+        if (attendance.early_exit) return <Badge className="bg-orange-500">Left Early</Badge>
+        return <Badge variant="secondary">Partial</Badge>
     }
 
     if (isLoading) {
@@ -361,7 +359,7 @@ export function UserDetailsPage() {
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="flex flex-col">
-                                                        <span className="font-medium">{record.session?.title || `Session #${record.fitness_session_id}`}</span>
+                                                        <span className="font-medium">{record.fitness_session?.title || `Session #${record.fitness_session_id}`}</span>
                                                         <Link
                                                             to={`/fitness-sessions/${record.fitness_session_id}`}
                                                             className="text-xs text-blue-600 hover:underline"
@@ -374,19 +372,19 @@ export function UserDetailsPage() {
                                                     <div className="text-sm">
                                                         <div className="flex items-center gap-1 text-green-600">
                                                             <span className="text-xs uppercase w-8">In</span>
-                                                            {record.join_time ? format(new Date(record.join_time), 'h:mm a') : '-'}
+                                                            {record.joined_at ? format(new Date(record.joined_at), 'h:mm a') : '-'}
                                                         </div>
                                                         <div className="flex items-center gap-1 text-slate-500">
                                                             <span className="text-xs uppercase w-8">Out</span>
-                                                            {record.leave_time ? format(new Date(record.leave_time), 'h:mm a') : '-'}
+                                                            {record.left_at ? format(new Date(record.left_at), 'h:mm a') : '-'}
                                                         </div>
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    {record.duration_minutes} min
+                                                    {record.total_minutes_attended} min
                                                 </TableCell>
                                                 <TableCell>
-                                                    {getStatusBadge(record.status)}
+                                                    {getStatusBadge(record)}
                                                 </TableCell>
                                             </TableRow>
                                         ))

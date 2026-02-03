@@ -17,8 +17,7 @@ import { CreateSessionPage } from './pages/fitness-sessions/create'
 import { EditSessionPage } from './pages/fitness-sessions/edit'
 import { SessionDetailsPage } from './pages/fitness-sessions/detail'
 import { AttendancePage } from './pages/attendance'
-import { OrdersPage } from './pages/orders'
-import { SettingsPage } from './pages/settings'
+
 
 function App() {
   return (
