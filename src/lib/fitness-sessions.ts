@@ -12,6 +12,29 @@ export interface ZoomMetadata {
     duration?: number
 }
 
+export interface Attendance {
+    id: number
+    user_id: number
+    fitness_session_id: number
+    join_token: string
+    joined_at: string | null
+    left_at: string | null
+    total_minutes_attended: number
+    attended_fully: boolean
+    early_exit: boolean
+    user: {
+        id: number
+        name: string
+        email: string
+        phone: string
+        whatsapp_number: string | null
+        blood_group: string | null
+        height_cm: number | null
+        weight_kg: string | null
+        availability_days: string[]
+    }
+}
+
 export interface FitnessSession {
     id: number
     title: string
@@ -23,6 +46,7 @@ export interface FitnessSession {
     zoom_meeting_id?: string
     zoom_join_url?: string
     zoom_metadata?: ZoomMetadata
+    attendances?: Attendance[]
     join_tokens?: {
         id: number
         user_id: number
@@ -31,6 +55,7 @@ export interface FitnessSession {
             id: number
             name: string
             email: string
+            phone?: string
             availability_days: string[]
         }
     }[]

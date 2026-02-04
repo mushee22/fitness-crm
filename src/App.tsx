@@ -17,6 +17,7 @@ import { CreateSessionPage } from './pages/fitness-sessions/create'
 import { EditSessionPage } from './pages/fitness-sessions/edit'
 import { SessionDetailsPage } from './pages/fitness-sessions/detail'
 import { AttendancePage } from './pages/attendance'
+import { AttendanceDetailsPage } from './pages/attendance/detail'
 
 
 function App() {
@@ -48,15 +49,16 @@ function App() {
               </Route>
 
               {/* Fitness Sessions Routes */}
+              <Route path="upcoming-sessions" element={<UpcomingSessionsPage />} />
               <Route path="fitness-sessions">
                 <Route index element={<FitnessSessionsPage />} />
-                <Route path="upcoming" element={<UpcomingSessionsPage />} />
                 <Route path="create" element={<CreateSessionPage />} />
                 <Route path=":id" element={<SessionDetailsPage />} />
                 <Route path=":id/edit" element={<EditSessionPage />} />
               </Route>
 
               <Route path="attendance" element={<AttendancePage />} />
+              <Route path="attendance/:id" element={<AttendanceDetailsPage />} />
               {/* <Route path="orders" element={<OrdersPage />} />
               <Route path="settings" element={<SettingsPage />} /> */}
             </Route>

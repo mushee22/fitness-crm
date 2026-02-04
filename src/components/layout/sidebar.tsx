@@ -14,7 +14,7 @@ const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
     { name: 'Users', href: '/users', icon: Users },
     { name: 'Fitness Sessions', href: '/fitness-sessions', icon: Dumbbell },
-    { name: 'Upcoming', href: '/fitness-sessions/upcoming', icon: CalendarIcon },
+    { name: 'Upcoming Sessions', href: '/upcoming-sessions', icon: CalendarIcon },
     { name: 'Attendance', href: '/attendance', icon: ClipboardList },
 ]
 

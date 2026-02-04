@@ -77,6 +77,11 @@ export const attendanceService = {
         return response.data
     },
 
+    async getAttendance(id: number): Promise<{ data: Attendance }> {
+        const response = await api.get(`attendances/${id}`)
+        return response.data
+    },
+
     async getUserStats(userId: string): Promise<UserAttendanceStats> {
         const response = await api.get(`attendances/user/${userId}/stats`)
         return response.data

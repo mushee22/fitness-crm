@@ -1,12 +1,24 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Calendar, Clock, Video, Users, Trash2, Edit } from 'lucide-react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import {
+    ArrowLeft,
+    Calendar,
+    Clock,
+    Video,
+    Users,
+    Trash2,
+    Edit,
+    Activity,
+    AlertTriangle,
+    Eye
+} from 'lucide-react'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
     AlertDialog,
     AlertDialogAction,
@@ -18,34 +30,43 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 import { fitnessSessionsService } from '@/lib/fitness-sessions'
-import { attendanceService } from '@/lib/attendance'
 import { analyticsService } from '@/lib/analytics'
+import { attendanceService } from '@/lib/attendance'
 import { formatDate } from '@/lib/utils'
-import { ChartCard } from '@/components/dashboard/chart-card'
 
 export function SessionDetailsPage() {
     const { id } = useParams<{ id: string }>()
     const navigate = useNavigate()
     const queryClient = useQueryClient()
 
-    const { data: session, isLoading, error } = useQuery({
+    const { data: sessionData, isLoading, error } = useQuery({
         queryKey: ['fitness-sessions', id],
         queryFn: () => fitnessSessionsService.getSession(Number(id)),
         enabled: !!id,
     })
 
-    const { data: sessionStats, isLoading: statsLoading } = useQuery({
-        queryKey: ['attendance-stats', 'session', id],
-        queryFn: () => attendanceService.getSessionStats(Number(id)),
-        enabled: !!id,
-    })
-
-    const { data: sessionAnalytics, isLoading: analyticsLoading } = useQuery({
+    const { data: analytics, isLoading: isLoadingAnalytics } = useQuery({
         queryKey: ['session-analytics', id],
         queryFn: () => analyticsService.getSessionAnalytics(Number(id)),
         enabled: !!id,
     })
+
+    const { data: attendanceStats } = useQuery({
+        queryKey: ['session-attendance-stats', id],
+        queryFn: () => attendanceService.getSessionStats(Number(id)),
+        enabled: !!id,
+    })
+
+    const session = sessionData?.data
 
     const deleteMutation = useMutation({
         mutationFn: fitnessSessionsService.deleteSession,
@@ -96,8 +117,7 @@ export function SessionDetailsPage() {
         )
     }
 
-    // Determine participants list 
-    const participants = session.data.join_tokens?.map(t => t.user) || []
+
 
     return (
         <div className="space-y-6">
@@ -113,14 +133,14 @@ export function SessionDetailsPage() {
                         <ArrowLeft className="h-5 w-5" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">{session.data.title}</h1>
+                        <h1 className="text-2xl font-bold text-slate-900">{session.title}</h1>
                         <div className="flex items-center gap-2 mt-1 text-slate-600">
                             <Calendar className="h-4 w-4" />
-                            <span>{formatDate(session.data.date)}</span>
+                            <span>{formatDate(session.date)}</span>
                             <span className="text-slate-300">•</span>
                             <Clock className="h-4 w-4" />
                             <span>
-                                {format(new Date(session.data.start_time), 'h:mm a')} - {format(new Date(session.data.end_time), 'h:mm a')}
+                                {format(new Date(session.start_time), 'h:mm a')} - {format(new Date(session.end_time), 'h:mm a')}
                             </span>
                         </div>
                     </div>
@@ -128,7 +148,7 @@ export function SessionDetailsPage() {
                 <div className="flex gap-2">
                     <Button
                         variant="outline"
-                        onClick={() => navigate(`/fitness-sessions/${session.data.id}/edit`)}
+                        onClick={() => navigate(`/fitness-sessions/${session.id}/edit`)}
                     >
                         <Edit className="h-4 w-4 mr-2" />
                         Edit Session
@@ -150,7 +170,7 @@ export function SessionDetailsPage() {
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 <AlertDialogAction
-                                    onClick={() => deleteMutation.mutate(session.data.id)}
+                                    onClick={() => deleteMutation.mutate(session.id)}
                                     className="bg-red-600 hover:bg-red-700"
                                 >
                                     {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
@@ -161,232 +181,319 @@ export function SessionDetailsPage() {
                 </div>
             </div>
 
-            {/* Statistics Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Total Users</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {statsLoading ? <Skeleton className="h-8 w-12" /> : sessionStats?.total_users || 0}
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Attended</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {statsLoading ? <Skeleton className="h-8 w-12" /> : sessionStats?.attended_count || 0}
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Attendance Rate</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {statsLoading ? <Skeleton className="h-8 w-16" /> : `${sessionStats?.attendance_rate || 0}%`}
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Fully Attended</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {statsLoading ? <Skeleton className="h-8 w-12" /> : sessionStats?.fully_attended_count || 0}
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Early Exits</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {statsLoading ? <Skeleton className="h-8 w-12" /> : sessionStats?.early_exit_count || 0}
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
+            <Tabs defaultValue="overview" className="w-full">
+                <TabsList className="mb-4">
+                    <TabsTrigger value="overview">Overview</TabsTrigger>
+                    <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                    <TabsTrigger value="attendees">Attendees</TabsTrigger>
+                </TabsList>
 
-            {/* Analytics Section */}
-            <div className="grid gap-4 md:grid-cols-4">
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Avg. Rating</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {analyticsLoading ? <Skeleton className="h-8 w-12" /> : sessionAnalytics?.average_rating?.toFixed(1) || '-'}
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Engagement</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {analyticsLoading ? <Skeleton className="h-8 w-12" /> : `${sessionAnalytics?.engagement_score || 0}%`}
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Peak Users</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {analyticsLoading ? <Skeleton className="h-8 w-12" /> : sessionAnalytics?.peak_concurrent_users || 0}
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Feedback</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {analyticsLoading ? <Skeleton className="h-8 w-12" /> : sessionAnalytics?.feedback_count || 0}
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-
-            {/* Charts */}
-            <div className="grid gap-6">
-                {analyticsLoading ? (
-                    <Skeleton className="h-[300px]" />
-                ) : (
-                    <ChartCard
-                        title="Join Time Distribution"
-                        data={sessionAnalytics?.join_time_distribution || []}
-                        type="bar"
-                    />
-                )}
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-                {/* Session Details Card */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Session Information</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        {session.data.zoom_join_url && (
-                            <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 flex items-start gap-3">
-                                <div className="p-2 bg-blue-100 rounded-lg">
-                                    <Video className="h-5 w-5 text-blue-600" />
+                <TabsContent value="overview" className="space-y-6">
+                    {/* Overview Content */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <Card>
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm font-medium text-slate-500">Total Users</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    {attendanceStats?.total_users || 0}
                                 </div>
-                                <div className="flex-1 overflow-hidden space-y-2">
-                                    <div>
-                                        <h4 className="font-semibold text-blue-900">Zoom Meeting</h4>
-                                        <p className="text-sm text-blue-700">
-                                            ID: {session.data.zoom_meeting_id}
-                                        </p>
-                                        {session.data.zoom_metadata?.password && (
-                                            <p className="text-sm text-blue-700">
-                                                Password: {session.data.zoom_metadata.password}
-                                            </p>
-                                        )}
-                                        {session.data.zoom_metadata?.host_email && (
-                                            <p className="text-sm text-blue-700">
-                                                Host: {session.data.zoom_metadata.host_email}
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    <div className="flex flex-wrap gap-3 pt-1">
-                                        {session.data.zoom_metadata?.start_url && (
-                                            <a
-                                                href={session.data.zoom_metadata.start_url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-sm font-medium text-blue-700 hover:text-blue-900 hover:underline bg-blue-100/50 px-3 py-1.5 rounded-md border border-blue-200"
-                                            >
-                                                Start Meeting (Host)
-                                            </a>
-                                        )}
-                                        <a
-                                            href={session.data.zoom_join_url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-md transition-colors"
-                                        >
-                                            Join Meeting
-                                        </a>
-                                    </div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm font-medium text-slate-500">Attended</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    {attendanceStats?.attended_count || 0}
                                 </div>
-                            </div>
-                        )}
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm font-medium text-slate-500">Attendance Rate</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    {`${attendanceStats?.attendance_rate || 0}%`}
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm font-medium text-slate-500">Fully Attended</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    {attendanceStats?.fully_attended_count || 0}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                        <div className="flex items-center justify-between p-4 border rounded-lg">
-                            <span className="text-sm font-medium text-slate-500">Availability Filter</span>
-                            <Badge variant={session.data.filter_by_availability ? "default" : "secondary"}>
-                                {session.data.filter_by_availability ? "Enabled" : "Disabled"}
-                            </Badge>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* Participants Card */}
-                <Card>
-                    <CardHeader>
-                        <div className="flex items-center justify-between">
-                            <CardTitle>Participants</CardTitle>
-                            <Badge variant="outline">{participants.length} Users</Badge>
-                        </div>
-                        <CardDescription>
-                            Users registered for this session
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {participants.length > 0 ? (
-                            <div className="space-y-4">
-                                {participants.map((user) => (
-                                    <div key={user.id} className="flex items-start justify-between p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-sm font-medium text-slate-600">
-                                                {user.name.substring(0, 2).toUpperCase()}
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-slate-900">{user.name}</p>
-                                                <p className="text-xs text-slate-500">{user.email}</p>
-                                            </div>
+                    <div className="grid gap-6 md:grid-cols-2">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Session Information</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                {session.zoom_join_url && (
+                                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 flex items-start gap-3">
+                                        <div className="p-2 bg-blue-100 rounded-lg">
+                                            <Video className="h-5 w-5 text-blue-600" />
                                         </div>
-                                        <div className="text-right">
-                                            <p className="text-xs font-medium text-slate-500 mb-1">Availability</p>
-                                            <div className="flex flex-wrap justify-end gap-1">
-                                                {user.availability_days.slice(0, 3).map((day) => (
-                                                    <Badge key={day} variant="outline" className="text-[10px] px-1.5 py-0 capitalize">
-                                                        {day.substring(0, 3)}
-                                                    </Badge>
-                                                ))}
-                                                {user.availability_days.length > 3 && (
-                                                    <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                                                        +{user.availability_days.length - 3}
-                                                    </Badge>
+                                        <div className="flex-1 overflow-hidden space-y-2">
+                                            <div>
+                                                <h4 className="font-semibold text-blue-900">Zoom Meeting</h4>
+                                                <p className="text-sm text-blue-700">
+                                                    ID: {session.zoom_meeting_id}
+                                                </p>
+                                                {session.zoom_metadata?.password && (
+                                                    <p className="text-sm text-blue-700">
+                                                        Password: {session.zoom_metadata.password}
+                                                    </p>
                                                 )}
                                             </div>
+
+                                            <div className="flex flex-wrap gap-3 pt-1">
+                                                {session.zoom_metadata?.start_url && (
+                                                    <a
+                                                        href={session.zoom_metadata.start_url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-sm font-medium text-blue-700 hover:text-blue-900 hover:underline bg-blue-100/50 px-3 py-1.5 rounded-md border border-blue-200"
+                                                    >
+                                                        Start Meeting (Host)
+                                                    </a>
+                                                )}
+                                                <a
+                                                    href={session.zoom_join_url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-md transition-colors"
+                                                >
+                                                    Join Meeting
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
-                                ))}
+                                )}
+
+                                <div className="flex items-center justify-between p-4 border rounded-lg">
+                                    <span className="text-sm font-medium text-slate-500">Availability Filter</span>
+                                    <Badge variant={session.filter_by_availability ? "default" : "secondary"}>
+                                        {session.filter_by_availability ? "Enabled" : "Disabled"}
+                                    </Badge>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </TabsContent>
+
+                <TabsContent value="analytics" className="space-y-6">
+                    {/* Analytics Content from analyticsService */}
+                    {isLoadingAnalytics ? (
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                            {[...Array(4)].map((_, i) => (
+                                <Skeleton key={i} className="h-32 bg-slate-200" />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="space-y-6">
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                                <Card>
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                        <CardTitle className="text-sm font-medium">Early Exits</CardTitle>
+                                        <AlertTriangle className="h-4 w-4 text-amber-500" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold">
+                                            {analytics?.statistics.early_exits || 0}
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">
+                                            {analytics?.statistics.early_exit_percentage || 0}% of attendees
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                                <Card>
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                        <CardTitle className="text-sm font-medium">Avg Duration</CardTitle>
+                                        <Clock className="h-4 w-4 text-blue-500" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold">
+                                            {analytics?.statistics.average_duration_minutes || 0}m
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">
+                                            Expected: {analytics?.statistics.expected_duration_minutes || 60}m
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                                <Card>
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                        <CardTitle className="text-sm font-medium">Fully Attended</CardTitle>
+                                        <Activity className="h-4 w-4 text-green-500" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold">
+                                            {analytics?.statistics.fully_attended || 0}
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">
+                                            Users attended full session
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                                <Card>
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                        <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                                        <Users className="h-4 w-4 text-slate-500" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold">
+                                            {analytics?.statistics.total_users || 0}
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             </div>
-                        ) : (
-                            <div className="text-center py-8 text-slate-500">
-                                <Users className="h-8 w-8 mx-auto mb-2 text-slate-300" />
-                                <p>No participants yet</p>
+                        </div>
+                    )}
+                </TabsContent>
+
+                <TabsContent value="attendees" className="space-y-6">
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center justify-between">
+                                <CardTitle>Attended Users</CardTitle>
+                                <Badge variant="outline">{session.attendances?.length || 0} Users</Badge>
                             </div>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
+                            <CardDescription>
+                                Users who joined the session
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {session.attendances && session.attendances.length > 0 ? (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>User</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead>Join Time</TableHead>
+                                            <TableHead>Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {session.attendances.map((attendance) => (
+                                            <TableRow key={attendance.id}>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-medium text-slate-600">
+                                                            {attendance.user.name.substring(0, 2).toUpperCase()}
+                                                        </div>
+                                                        <div>
+                                                            <Link to={`/users/${attendance.user.id}`} className="font-medium text-slate-900 hover:underline">
+                                                                {attendance.user.name}
+                                                            </Link>
+                                                            <p className="text-xs text-slate-500">{attendance.user.email}</p>
+                                                        </div>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {attendance.attended_fully ? <Badge className="bg-green-500">Attended</Badge> :
+                                                        attendance.early_exit ? <Badge className="bg-orange-500">Left Early</Badge> :
+                                                            <Badge variant="secondary">Partial</Badge>
+                                                    }
+                                                </TableCell>
+                                                <TableCell>
+                                                    {attendance.joined_at ? format(new Date(attendance.joined_at), 'h:mm a') : '-'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => navigate(`/attendance/${attendance.id}`)}
+                                                    >
+                                                        <Eye className="h-4 w-4 text-slate-500" />
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            ) : (
+                                <div className="text-center py-8 text-slate-500">
+                                    <Users className="h-8 w-8 mx-auto mb-2 text-slate-300" />
+                                    <p>No attendees yet</p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center justify-between">
+                                <CardTitle>Invited Users</CardTitle>
+                                <Badge variant="outline">{session.join_tokens?.length || 0} Users</Badge>
+                            </div>
+                            <CardDescription>
+                                Users invited to this session
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {session.join_tokens && session.join_tokens.length > 0 ? (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>User</TableHead>
+                                            <TableHead>Email</TableHead>
+                                            <TableHead>Availability</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {session.join_tokens.map((token) => (
+                                            <TableRow key={token.id}>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-medium text-slate-600">
+                                                            {token.user.name.substring(0, 2).toUpperCase()}
+                                                        </div>
+                                                        <Link to={`/users/${token.user.id}`} className="font-medium text-slate-900 hover:underline">
+                                                            {token.user.name}
+                                                        </Link>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-slate-500">
+                                                    {token.user.email}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {token.user.availability_days?.slice(0, 3).map((day) => (
+                                                            <Badge key={day} variant="outline" className="text-[10px] px-1.5 py-0 capitalize">
+                                                                {day.substring(0, 3)}
+                                                            </Badge>
+                                                        ))}
+                                                        {token.user.availability_days?.length > 3 && (
+                                                            <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                                                                +{token.user.availability_days.length - 3}
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            ) : (
+                                <div className="text-center py-8 text-slate-500">
+                                    <Users className="h-8 w-8 mx-auto mb-2 text-slate-300" />
+                                    <p>No invited users</p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
         </div>
     )
 }

@@ -46,6 +46,29 @@ export interface DashboardData {
     }>
 }
 
+// Response structure for /api/analytics/dropout
+export interface DropoutUser {
+    id: number
+    name: string
+    email: string
+    phone: string
+    last_attended_at: string | null
+    total_sessions_attended: number
+}
+
+export interface DropoutAnalyticsResponse {
+    dropout_patterns: {
+        missed_3_days: number
+        missed_5_days: number
+        missed_9_days: number
+        missed_10_days: number
+    }
+    users_missed_3_days: DropoutUser[]
+    users_missed_5_days: DropoutUser[]
+    users_missed_9_days: DropoutUser[]
+    users_missed_10_days: DropoutUser[]
+}
+
 export interface UserAnalytics {
     user: {
         id: number
@@ -68,11 +91,24 @@ export interface UserAnalytics {
 }
 
 export interface SessionAnalytics {
-    average_rating: number
-    feedback_count: number
-    engagement_score: number
-    peak_concurrent_users: number
-    join_time_distribution: ChartData[]
+    session: {
+        id: number
+        title: string
+        date: string
+        start_time: string
+        end_time: string
+    }
+    statistics: {
+        total_users: number
+        attended_count: number
+        attendance_rate: number
+        fully_attended: number
+        early_exits: number
+        early_exit_percentage: number
+        average_duration_minutes: number
+        expected_duration_minutes: number
+    }
+    attendances: Attendance[]
 }
 
 export const analyticsService = {
@@ -92,6 +128,11 @@ export const analyticsService = {
 
     async getSessionAnalytics(sessionId: number): Promise<SessionAnalytics> {
         const response = await api.get(`analytics/session/${sessionId}`)
+        return response.data
+    },
+
+    async getDropoutAnalytics(): Promise<DropoutAnalyticsResponse> {
+        const response = await api.get('/analytics/dropout')
         return response.data
     }
 }

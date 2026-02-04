@@ -7,7 +7,7 @@ export function DashboardLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
     return (
-        <div className="flex h-screen overflow-hidden bg-slate-50">
+        <div className="flex min-h-screen overflow-hidden bg-slate-50">
             <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
             <div className="flex flex-1 flex-col overflow-hidden">
                 <Navbar onMenuClick={() => setSidebarOpen(true)} />
