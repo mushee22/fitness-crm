@@ -1,5 +1,5 @@
 import { Link, useParams, useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import {
     ArrowLeft,
     Edit,
@@ -15,8 +15,10 @@ import {
     Users,
     Clock,
     AlertTriangle,
-    Eye
+    Eye,
+    Utensils,
 } from 'lucide-react'
+import * as React from 'react'
 import { format } from 'date-fns'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -28,6 +30,23 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { usersService } from '@/lib/users'
 import { attendanceService, type Attendance } from '@/lib/attendance'
 import { analyticsService } from '@/lib/analytics'
+import { dietPlansService } from '@/lib/diet-plans'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
+import { toast } from 'sonner'
 import { formatDate, getInitials } from '@/lib/utils'
 
 export function UserDetailsPage() {
@@ -56,6 +75,37 @@ export function UserDetailsPage() {
         queryFn: () => analyticsService.getUserAnalytics(id!),
         enabled: !!id,
     })
+
+
+    const { data: dietHistoryData, isLoading: loadingDietHistory } = useQuery({
+        queryKey: ['diet-plans', 'user', id, 'history'],
+        queryFn: () => dietPlansService.getUserDietHistory(id!),
+        enabled: !!id,
+    })
+    const { data: dietPlansData } = useQuery({
+        queryKey: ['diet-plans', 'all'],
+        queryFn: () => dietPlansService.getDietPlans(1, 100), // Get all plans for selection
+    })
+
+    const [isAssignDialogOpen, setIsAssignDialogOpen] = React.useState(false)
+    const [selectedDietPlanId, setSelectedDietPlanId] = React.useState<string>('')
+
+    const assignMutation = useMutation({
+        mutationFn: (dietPlanId: number) => dietPlansService.assignDietPlanToUser(Number(id), dietPlanId),
+        onSuccess: () => {
+            toast.success('Diet plan assigned successfully')
+            setIsAssignDialogOpen(false)
+            setSelectedDietPlanId('')
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || 'Failed to assign diet plan')
+        },
+    })
+
+    const handleAssign = () => {
+        if (!selectedDietPlanId) return
+        assignMutation.mutate(Number(selectedDietPlanId))
+    }
 
     const user = usersData?.data.find((u) => u.id === Number(id))
 
@@ -114,12 +164,12 @@ export function UserDetailsPage() {
                         variant="ghost"
                         size="icon"
                         onClick={() => navigate('/users')}
-                        className="hover:bg-slate-100 flex-shrink-0"
+                        className="hover:bg-slate-100 shrink-0"
                     >
                         <ArrowLeft className="h-5 w-5" />
                     </Button>
                     <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
-                        <Avatar className="h-12 w-12 sm:h-16 sm:w-16 border-2 border-slate-200 flex-shrink-0">
+                        <Avatar className="h-12 w-12 sm:h-16 sm:w-16 border-2 border-slate-200 shrink-0">
                             <AvatarFallback className="bg-blue-100 text-blue-700 text-lg sm:text-xl font-semibold">
                                 {getInitials(user.name)}
                             </AvatarFallback>
@@ -133,16 +183,57 @@ export function UserDetailsPage() {
                         </div>
                     </div>
                 </div>
-                <Button onClick={() => navigate(`/users/${id}/edit`)} className="shadow-sm w-full sm:w-auto">
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit Member
-                </Button>
+                <div className="flex gap-2">
+                    <Button onClick={() => setIsAssignDialogOpen(true)} variant="outline" className="shadow-sm w-full sm:w-auto">
+                        <Utensils className="h-4 w-4 mr-2" />
+                        Assign Diet
+                    </Button>
+                    <Button onClick={() => navigate(`/users/${id}/edit`)} className="shadow-sm w-full sm:w-auto">
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Member
+                    </Button>
+                </div>
             </div>
+
+            <Dialog open={isAssignDialogOpen} onOpenChange={setIsAssignDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Assign Diet Plan</DialogTitle>
+                        <DialogDescription>
+                            Select a diet plan to assign to {user.name}.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="plan">Diet Plan</Label>
+                            <Select value={selectedDietPlanId} onValueChange={setSelectedDietPlanId}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a plan" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {dietPlansData?.data.map((plan) => (
+                                        <SelectItem key={plan.id} value={String(plan.id)}>
+                                            {plan.name} ({plan.daily_calories} kcal)
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <div className="flex justify-end gap-3">
+                        <Button variant="outline" onClick={() => setIsAssignDialogOpen(false)}>Cancel</Button>
+                        <Button onClick={handleAssign} disabled={!selectedDietPlanId || assignMutation.isPending}>
+                            {assignMutation.isPending ? 'Assigning...' : 'Assign Plan'}
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
 
             <Tabs defaultValue="overview" className="w-full">
                 <TabsList className="mb-4">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="attendance">Attendance</TabsTrigger>
+                    <TabsTrigger value="diet-history">Diet History</TabsTrigger>
                     <TabsTrigger value="analytics">Analytics</TabsTrigger>
                 </TabsList>
 
@@ -158,7 +249,7 @@ export function UserDetailsPage() {
                             </CardHeader>
                             <CardContent className="pt-4 sm:pt-6 space-y-3 sm:space-y-4">
                                 <div className="flex items-start gap-3">
-                                    <div className="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                                    <div className="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
                                         <Mail className="h-5 w-5 text-blue-600" />
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -167,7 +258,7 @@ export function UserDetailsPage() {
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3">
-                                    <div className="h-10 w-10 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0">
+                                    <div className="h-10 w-10 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
                                         <Phone className="h-5 w-5 text-green-600" />
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -176,7 +267,7 @@ export function UserDetailsPage() {
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3">
-                                    <div className="h-10 w-10 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                                    <div className="h-10 w-10 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
                                         <MessageCircle className="h-5 w-5 text-emerald-600" />
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -197,7 +288,7 @@ export function UserDetailsPage() {
                             </CardHeader>
                             <CardContent className="pt-4 sm:pt-6 space-y-3 sm:space-y-4">
                                 <div className="flex items-start gap-3">
-                                    <div className="h-10 w-10 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
+                                    <div className="h-10 w-10 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
                                         <Droplet className="h-5 w-5 text-red-600" />
                                     </div>
                                     <div className="flex-1">
@@ -206,7 +297,7 @@ export function UserDetailsPage() {
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3">
-                                    <div className="h-10 w-10 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
+                                    <div className="h-10 w-10 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
                                         <Ruler className="h-5 w-5 text-purple-600" />
                                     </div>
                                     <div className="flex-1">
@@ -215,7 +306,7 @@ export function UserDetailsPage() {
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3">
-                                    <div className="h-10 w-10 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                                    <div className="h-10 w-10 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
                                         <Weight className="h-5 w-5 text-indigo-600" />
                                     </div>
                                     <div className="flex-1">
@@ -236,7 +327,7 @@ export function UserDetailsPage() {
                             </CardHeader>
                             <CardContent className="pt-4 sm:pt-6 space-y-3 sm:space-y-4">
                                 <div className="flex items-start gap-3">
-                                    <div className="h-10 w-10 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0">
+                                    <div className="h-10 w-10 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
                                         <CalendarIcon className="h-5 w-5 text-green-600" />
                                     </div>
                                     <div className="flex-1">
@@ -245,7 +336,7 @@ export function UserDetailsPage() {
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3">
-                                    <div className="h-10 w-10 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                                    <div className="h-10 w-10 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
                                         <CalendarIcon className="h-5 w-5 text-amber-600" />
                                     </div>
                                     <div className="flex-1">
@@ -471,6 +562,75 @@ export function UserDetailsPage() {
                                 )}
                             </div>
 
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="diet-history">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Diet Plan History</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {loadingDietHistory ? (
+                                <div className="space-y-4">
+                                    {[...Array(3)].map((_, i) => (
+                                        <Skeleton key={i} className="h-20 w-full" />
+                                    ))}
+                                </div>
+                            ) : dietHistoryData?.data && dietHistoryData.data.length > 0 ? (
+                                <div className="space-y-4">
+                                    {dietHistoryData.data.map((item) => (
+                                        <div key={`${item.diet_plan.id}-${item.assigned_at}`} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                            <div className="space-y-1">
+                                                <div className="flex items-center gap-2">
+                                                    <h3 className="font-semibold text-slate-900">{item.diet_plan.name}</h3>
+                                                    <Badge variant="secondary" className="bg-green-100 text-green-700">
+                                                        {item.diet_plan.daily_calories} kcal
+                                                    </Badge>
+                                                    {!!item.is_active ? <Badge className="bg-green-500">Active</Badge> : <Badge variant="outline">Ended</Badge>}
+                                                </div>
+                                                <p className="text-sm text-slate-500 line-clamp-1">{item.diet_plan.description}</p>
+                                                <div className="text-xs text-slate-500 flex items-center gap-4 mt-2">
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="font-medium text-blue-600">P: {item.diet_plan.macronutrients?.protein || 0}g</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="font-medium text-amber-600">C: {item.diet_plan.macronutrients?.carbs || 0}g</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="font-medium text-red-600">F: {item.diet_plan.macronutrients?.fats || 0}g</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1 text-slate-400">
+                                                        <span>|</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <CalendarIcon className="h-3 w-3" />
+                                                        <span>Assigned: {format(new Date(item.assigned_at), 'MMM d, yyyy')}</span>
+                                                    </div>
+                                                    {item.ended_at && (
+                                                        <div className="flex items-center gap-1">
+                                                            <CalendarIcon className="h-3 w-3" />
+                                                            <span>Ended: {format(new Date(item.ended_at), 'MMM d, yyyy')}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="mt-4 sm:mt-0">
+                                                <Button variant="outline" size="sm" onClick={() => navigate(`/diet-plans/${item.diet_plan.id}`)}>
+                                                    View Plan
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 text-slate-500">
+                                    <Utensils className="h-10 w-10 mx-auto mb-3 text-slate-300" />
+                                    <p className="font-medium">No diet history found</p>
+                                    <p className="text-sm">This user hasn't been assigned any diet plans yet.</p>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </TabsContent>

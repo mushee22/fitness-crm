@@ -40,8 +40,12 @@ export interface UsersListResponse {
 }
 
 export const usersService = {
-    async getUsers(page = 1, perPage = 15): Promise<UsersListResponse> {
-        const response = await api.get(`users?page=${page}&per_page=${perPage}`)
+    async getUsers(page = 1, perPage = 15, search?: string): Promise<UsersListResponse> {
+        let url = `users?page=${page}&per_page=${perPage}`
+        if (search) {
+            url += `&search=${encodeURIComponent(search)}`
+        }
+        const response = await api.get(url)
         return response.data
     },
 

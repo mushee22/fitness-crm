@@ -7,6 +7,7 @@ import {
     Dumbbell,
     ClipboardList,
     Calendar as CalendarIcon,
+    Utensils,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -16,6 +17,7 @@ const navigation = [
     { name: 'Fitness Sessions', href: '/fitness-sessions', icon: Dumbbell },
     { name: 'Upcoming Sessions', href: '/upcoming-sessions', icon: CalendarIcon },
     { name: 'Attendance', href: '/attendance', icon: ClipboardList },
+    { name: 'Diet Plans', href: '/diet-plans', icon: Utensils },
 ]
 
 interface SidebarProps {

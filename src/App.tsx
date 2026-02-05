@@ -18,6 +18,10 @@ import { EditSessionPage } from './pages/fitness-sessions/edit'
 import { SessionDetailsPage } from './pages/fitness-sessions/detail'
 import { AttendancePage } from './pages/attendance'
 import { AttendanceDetailsPage } from './pages/attendance/detail'
+import { DietPlansPage } from './pages/diet-plans'
+import { CreateDietPlanPage } from './pages/diet-plans/create'
+import { EditDietPlanPage } from './pages/diet-plans/edit'
+import { DietPlanDetailPage } from './pages/diet-plans/detail'
 
 
 function App() {
@@ -59,6 +63,15 @@ function App() {
 
               <Route path="attendance" element={<AttendancePage />} />
               <Route path="attendance/:id" element={<AttendanceDetailsPage />} />
+
+              {/* Diet Plans Routes */}
+              <Route path="diet-plans">
+                <Route index element={<DietPlansPage />} />
+                <Route path="create" element={<CreateDietPlanPage />} />
+                <Route path=":id" element={<DietPlanDetailPage />} />
+                <Route path=":id/edit" element={<EditDietPlanPage />} />
+              </Route>
+
               {/* <Route path="orders" element={<OrdersPage />} />
               <Route path="settings" element={<SettingsPage />} /> */}
             </Route>
