@@ -3,6 +3,7 @@ import { api } from './api'
 export interface User {
     id: number
     name: string
+    user_name?: string
     phone: string
     whatsapp_number: string
     email: string
@@ -19,6 +20,7 @@ export interface User {
 
 export interface CreateUserData {
     name: string
+    user_name: string
     phone: string
     whatsapp_number: string
     email: string

@@ -68,8 +68,8 @@ export interface CreateSessionData {
     date: string
     start_time: string
     end_time: string
-    filter_by_availability: boolean
-    user_ids: number[]
+    filter_by_availability?: boolean
+    user_ids?: number[]
 }
 
 export interface SessionsListResponse {

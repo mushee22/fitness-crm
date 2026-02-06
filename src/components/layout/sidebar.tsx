@@ -8,6 +8,7 @@ import {
     ClipboardList,
     Calendar as CalendarIcon,
     Utensils,
+    MessageCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -18,6 +19,7 @@ const navigation = [
     { name: 'Upcoming Sessions', href: '/upcoming-sessions', icon: CalendarIcon },
     { name: 'Attendance', href: '/attendance', icon: ClipboardList },
     { name: 'Diet Plans', href: '/diet-plans', icon: Utensils },
+    { name: 'Bulk Message', href: '/bulk-message', icon: MessageCircle },
 ]
 
 interface SidebarProps {

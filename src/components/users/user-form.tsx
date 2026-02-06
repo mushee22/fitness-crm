@@ -35,6 +35,7 @@ interface UserFormProps {
 export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps) {
     const [formData, setFormData] = useState<CreateUserData>({
         name: user?.name || '',
+        user_name: user?.user_name || '',
         phone: user?.phone || '',
         whatsapp_number: user?.whatsapp_number || '',
         email: user?.email || '',
@@ -87,6 +88,18 @@ export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps)
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             placeholder="Enter full name"
+                            required
+                        />
+                    </div>
+
+                    {/* User Name */}
+                    <div className="md:col-span-2 space-y-2">
+                        <Label htmlFor="user_name">User Name *</Label>
+                        <Input
+                            id="user_name"
+                            value={formData.user_name}
+                            onChange={(e) => setFormData({ ...formData, user_name: e.target.value })}
+                            placeholder="Enter user name"
                             required
                         />
                     </div>

@@ -54,18 +54,9 @@ export function UsersPage() {
     const filteredUsers = data?.data?.filter(
         (user) =>
             user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (user.user_name && user.user_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
             user.email.toLowerCase().includes(searchQuery.toLowerCase())
     )
-
-    const getMembershipStatus = (endDate: string) => {
-        const end = new Date(endDate)
-        const now = new Date()
-        const daysRemaining = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-
-        if (daysRemaining < 0) return { label: 'Expired', variant: 'destructive' as const }
-        if (daysRemaining <= 7) return { label: 'Expiring Soon', variant: 'warning' as const }
-        return { label: 'Active', variant: 'success' as const }
-    }
 
     return (
         <div className="space-y-4 sm:space-y-6">
@@ -87,7 +78,7 @@ export function UsersPage() {
                         <div className="relative w-full sm:w-80">
                             <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                             <Input
-                                placeholder="Search by name or email..."
+                                placeholder="Search by name, user name or email..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="pl-9 bg-white"
@@ -110,9 +101,9 @@ export function UsersPage() {
                                     <TableHeader>
                                         <TableRow className="hover:bg-transparent border-slate-200 bg-slate-50/30">
                                             <TableHead className="text-slate-700 font-semibold">Member</TableHead>
+                                            <TableHead className="text-slate-700 font-semibold">User Name</TableHead>
                                             <TableHead className="text-slate-700 font-semibold">Contact</TableHead>
                                             <TableHead className="text-slate-700 font-semibold">Blood Group</TableHead>
-                                            <TableHead className="text-slate-700 font-semibold">Status</TableHead>
                                             <TableHead className="text-slate-700 font-semibold">Joined</TableHead>
                                             <TableHead className="text-right text-slate-700 font-semibold">Actions</TableHead>
                                         </TableRow>
@@ -129,9 +120,7 @@ export function UsersPage() {
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
-                                            filteredUsers?.map((user) => {
-                                                const status = getMembershipStatus(user.end_date)
-                                                return (
+                                            filteredUsers?.map((user) => (
                                                     <TableRow
                                                         key={user.id}
                                                         className="border-slate-200 hover:bg-slate-50/50 transition-colors"
@@ -149,6 +138,9 @@ export function UsersPage() {
                                                                 </div>
                                                             </div>
                                                         </TableCell>
+                                                        <TableCell className="text-slate-700">
+                                                            {user.user_name || '—'}
+                                                        </TableCell>
                                                         <TableCell>
                                                             <div className="space-y-1">
                                                                 <p className="text-sm text-slate-900">{user.phone}</p>
@@ -158,11 +150,6 @@ export function UsersPage() {
                                                         <TableCell>
                                                             <Badge variant="outline" className="font-medium">
                                                                 {user.blood_group}
-                                                            </Badge>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Badge variant={status.variant}>
-                                                                {status.label}
                                                             </Badge>
                                                         </TableCell>
                                                         <TableCell className="text-slate-600">
@@ -197,8 +184,7 @@ export function UsersPage() {
                                                             </div>
                                                         </TableCell>
                                                     </TableRow>
-                                                )
-                                            })
+                                                ))
                                         )}
                                     </TableBody>
                                 </Table>
@@ -213,9 +199,7 @@ export function UsersPage() {
                                         <p className="text-sm">Try adjusting your search</p>
                                     </div>
                                 ) : (
-                                    filteredUsers?.map((user) => {
-                                        const status = getMembershipStatus(user.end_date)
-                                        return (
+                                    filteredUsers?.map((user) => (
                                             <div key={user.id} className="p-4 hover:bg-slate-50/50 transition-colors">
                                                 <div className="flex items-start gap-3 mb-3">
                                                     <Avatar className="h-12 w-12 border-2 border-slate-200">
@@ -226,10 +210,10 @@ export function UsersPage() {
                                                     <div className="flex-1 min-w-0">
                                                         <h3 className="font-medium text-slate-900 truncate">{user.name}</h3>
                                                         <p className="text-sm text-slate-500 truncate">{user.email}</p>
+                                                        {user.user_name && (
+                                                            <p className="text-xs text-slate-600 mt-0.5">@{user.user_name}</p>
+                                                        )}
                                                         <div className="flex items-center gap-2 mt-1">
-                                                            <Badge variant={status.variant} className="text-xs">
-                                                                {status.label}
-                                                            </Badge>
                                                             <Badge variant="outline" className="text-xs">
                                                                 {user.blood_group}
                                                             </Badge>
@@ -275,8 +259,7 @@ export function UsersPage() {
                                                     </Button>
                                                 </div>
                                             </div>
-                                        )
-                                    })
+                                        ))
                                 )}
                             </div>
 

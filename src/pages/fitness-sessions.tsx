@@ -268,7 +268,7 @@ export function FitnessSessionsPage() {
                                                     <TableCell>
                                                         <div className="flex items-center gap-1">
                                                             <Users className="h-4 w-4 text-slate-400" />
-                                                            <span className="text-slate-900">{session.join_tokens?.length || session.user_ids?.length || 0}</span>
+                                                            <span className="text-slate-900">{session.attendances?.length ?? 0}</span>
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="text-right">
@@ -335,7 +335,7 @@ export function FitnessSessionsPage() {
                                                 </div>
                                                 <div>
                                                     <p className="text-slate-500 text-xs">Participants</p>
-                                                    <p className="text-slate-900">{session.join_tokens?.length || session.user_ids?.length || 0} users</p>
+                                                    <p className="text-slate-900">{session.attendances?.length ?? 0} users</p>
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">

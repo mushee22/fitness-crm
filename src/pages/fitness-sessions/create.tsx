@@ -57,7 +57,7 @@ export function CreateSessionPage() {
                 <CardHeader className="border-b border-slate-200 bg-slate-50/50">
                     <CardTitle className="text-base sm:text-lg text-slate-900">Session Information</CardTitle>
                     <CardDescription className="text-sm">
-                        Fill in the details and select participants for the session
+                        Fill in the session details
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-4 sm:pt-6">
