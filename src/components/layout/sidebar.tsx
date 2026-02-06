@@ -50,7 +50,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 {/* Logo */}
                 <div className="flex h-16 items-center justify-between px-4 border-b border-slate-200">
                     <h1 className="text-xl font-semibold text-slate-900">
-                        Admin Panel
+                        Rishus CrossFit
                     </h1>
                     <Button
                         variant="ghost"
@@ -89,7 +89,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 {/* Footer */}
                 <div className="border-t border-slate-200 p-4">
                     <p className="text-xs text-slate-500">
-                        © 2026 Admin Dashboard
+                        © {new Date().getFullYear()} Rishus CrossFit
                     </p>
                 </div>
             </div>
