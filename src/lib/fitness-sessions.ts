@@ -35,6 +35,8 @@ export interface Attendance {
     }
 }
 
+export type SessionStatus = 'not_started' | 'started' | 'ended'
+
 export interface FitnessSession {
     id: number
     title: string
@@ -42,6 +44,7 @@ export interface FitnessSession {
     start_time: string
     end_time: string
     filter_by_availability: boolean
+    session_status?: SessionStatus
     user_ids?: number[]
     zoom_meeting_id?: string
     zoom_join_url?: string

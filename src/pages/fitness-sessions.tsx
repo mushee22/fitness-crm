@@ -24,8 +24,19 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
-import { fitnessSessionsService, type FitnessSession } from '@/lib/fitness-sessions'
+import { fitnessSessionsService, type FitnessSession, type SessionStatus } from '@/lib/fitness-sessions'
 import { formatDate } from '@/lib/utils'
+
+function getSessionStatusBadge(status?: SessionStatus) {
+    if (!status) return null
+    const config: Record<SessionStatus, { label: string; variant: 'secondary' | 'default' | 'destructive' | 'outline' }> = {
+        not_started: { label: 'Not Started', variant: 'secondary' },
+        started: { label: 'Started', variant: 'default' },
+        ended: { label: 'Ended', variant: 'outline' },
+    }
+    const { label, variant } = config[status]
+    return <Badge variant={variant} className="text-xs">{label}</Badge>
+}
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 
@@ -213,6 +224,7 @@ export function FitnessSessionsPage() {
                                     <TableHeader>
                                         <TableRow className="hover:bg-transparent border-slate-200 bg-slate-50/30">
                                             <TableHead className="text-slate-700 font-semibold">Session</TableHead>
+                                            <TableHead className="text-slate-700 font-semibold">Status</TableHead>
                                             <TableHead className="text-slate-700 font-semibold">Date</TableHead>
                                             <TableHead className="text-slate-700 font-semibold">Time</TableHead>
                                             <TableHead className="text-slate-700 font-semibold">Participants</TableHead>
@@ -222,7 +234,7 @@ export function FitnessSessionsPage() {
                                     <TableBody>
                                         {filteredSessions?.length === 0 ? (
                                             <TableRow>
-                                                <TableCell colSpan={5} className="h-32 text-center">
+                                                <TableCell colSpan={6} className="h-32 text-center">
                                                     <div className="flex flex-col items-center justify-center text-slate-500">
                                                         <CalendarIcon className="h-12 w-12 mb-2 text-slate-300" />
                                                         <p className="font-medium">No sessions found</p>
@@ -255,6 +267,9 @@ export function FitnessSessionsPage() {
                                                                 )}
                                                             </div>
                                                         </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {getSessionStatusBadge(session.session_status) ?? '—'}
                                                     </TableCell>
                                                     <TableCell className="text-slate-900">
                                                         {formatDate(session.date)}
@@ -324,6 +339,9 @@ export function FitnessSessionsPage() {
                                                 <div className="flex-1 min-w-0">
                                                     <h3 className="font-medium text-slate-900">{session.title}</h3>
                                                     <p className="text-sm text-slate-500">{formatDate(session.date)}</p>
+                                                    <div className="mt-1">
+                                                        {getSessionStatusBadge(session.session_status)}
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-2 gap-2 text-sm mb-3">

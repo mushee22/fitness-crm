@@ -10,7 +10,8 @@ import {
     Edit,
     Activity,
     AlertTriangle,
-    Eye
+    Eye,
+    Copy,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
@@ -38,7 +39,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { fitnessSessionsService } from '@/lib/fitness-sessions'
+import { fitnessSessionsService, type SessionStatus } from '@/lib/fitness-sessions'
 import { analyticsService } from '@/lib/analytics'
 import { attendanceService } from '@/lib/attendance'
 import { formatDate } from '@/lib/utils'
@@ -117,7 +118,16 @@ export function SessionDetailsPage() {
         )
     }
 
-
+    const getSessionStatusBadge = (status?: SessionStatus) => {
+        if (!status) return null
+        const config: Record<SessionStatus, { label: string; variant: 'secondary' | 'default' | 'destructive' | 'outline' }> = {
+            not_started: { label: 'Not Started', variant: 'secondary' },
+            started: { label: 'Started', variant: 'default' },
+            ended: { label: 'Ended', variant: 'outline' },
+        }
+        const { label, variant } = config[status]
+        return <Badge variant={variant} className="text-sm">{label}</Badge>
+    }
 
     return (
         <div className="space-y-6">
@@ -134,7 +144,7 @@ export function SessionDetailsPage() {
                     </Button>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900">{session.title}</h1>
-                        <div className="flex items-center gap-2 mt-1 text-slate-600">
+                        <div className="flex flex-wrap items-center gap-2 mt-1 text-slate-600">
                             <Calendar className="h-4 w-4" />
                             <span>{formatDate(session.date)}</span>
                             <span className="text-slate-300">•</span>
@@ -142,6 +152,12 @@ export function SessionDetailsPage() {
                             <span>
                                 {format(new Date(session.start_time), 'h:mm a')} - {format(new Date(session.end_time), 'h:mm a')}
                             </span>
+                            {session.session_status && (
+                                <>
+                                    <span className="text-slate-300">•</span>
+                                    {getSessionStatusBadge(session.session_status)}
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -267,7 +283,7 @@ export function SessionDetailsPage() {
                                                 )}
                                             </div>
 
-                                            <div className="flex flex-wrap gap-3 pt-1">
+                                            <div className="flex flex-wrap items-center gap-3 pt-1">
                                                 {session.zoom_metadata?.start_url && (
                                                     <a
                                                         href={session.zoom_metadata.start_url}
@@ -286,6 +302,19 @@ export function SessionDetailsPage() {
                                                 >
                                                     Join Meeting
                                                 </a>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="text-blue-700 border-blue-200 hover:bg-blue-100/50"
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(session.zoom_join_url!)
+                                                        toast.success('Join link copied to clipboard')
+                                                    }}
+                                                >
+                                                    <Copy className="h-4 w-4 mr-1.5" />
+                                                    Copy link
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>
