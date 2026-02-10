@@ -60,6 +60,23 @@ export interface SessionAttendanceStats {
     early_exit_count: number
 }
 
+export interface InactiveUser {
+    id: number
+    name: string
+    user_name: string
+    phone: string
+    email: string
+    consecutive_missed_days: number
+    last_attended_at: string | null
+    send_absence_reminders: boolean
+}
+
+export interface InactiveUsersResponse {
+    days: number
+    total: number
+    users: InactiveUser[]
+}
+
 export const attendanceService = {
     async getAttendances(filters: AttendanceFilters = {}): Promise<AttendanceListResponse> {
         const params = new URLSearchParams()
@@ -89,6 +106,13 @@ export const attendanceService = {
 
     async getSessionStats(sessionId: number): Promise<SessionAttendanceStats> {
         const response = await api.get(`attendances/session/${sessionId}/stats`)
+        return response.data
+    },
+
+    async getInactiveUsers(days: number = 3): Promise<InactiveUsersResponse> {
+        const params = new URLSearchParams()
+        params.append('days', String(Math.min(365, Math.max(1, days))))
+        const response = await api.get(`attendances/inactive-users?${params.toString()}`)
         return response.data
     }
 }

@@ -364,7 +364,7 @@ export function UserDetailsPage() {
                             <CardContent className="pt-4 sm:pt-6">
                                 <p className="text-xs sm:text-sm font-medium text-slate-500 mb-3">Available Days</p>
                                 <div className="flex flex-wrap gap-2">
-                                    {user.availability_days.map((day) => (
+                                    {user?.availability_days?.map((day) => (
                                         <Badge
                                             key={day}
                                             variant="secondary"

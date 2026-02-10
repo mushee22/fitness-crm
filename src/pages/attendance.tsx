@@ -2,19 +2,27 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
-import { Calendar as CalendarIcon, Clock, User, Eye } from 'lucide-react'
+import { Calendar as CalendarIcon, Clock, User, Eye, UserX } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Calendar } from '@/components/ui/calendar'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 import { attendanceService, type AttendanceFilters } from '@/lib/attendance'
 import { Skeleton } from '@/components/ui/skeleton'
+import { formatDate } from '@/lib/utils'
 
 export function AttendancePage() {
     const [page, setPage] = useState(1)
@@ -48,11 +56,18 @@ export function AttendancePage() {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Attendance Log</h1>
-                    <p className="text-slate-500">Track user attendance across sessions</p>
+                    <h1 className="text-2xl font-bold text-slate-900">Attendance</h1>
+                    <p className="text-slate-500">Track attendance and find inactive users</p>
                 </div>
             </div>
 
+            <Tabs defaultValue="log" className="w-full">
+                <TabsList className="mb-4">
+                    <TabsTrigger value="log">Attendance Log</TabsTrigger>
+                    <TabsTrigger value="inactive">Inactive Users</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="log" className="space-y-6">
             <Card>
                 <CardHeader className="pb-4">
                     <CardTitle className="text-base font-medium">Filters</CardTitle>
@@ -299,6 +314,159 @@ export function AttendancePage() {
 
                 </CardContent>
             </Card>
+                </TabsContent>
+
+                <TabsContent value="inactive" className="space-y-6">
+                    <InactiveUsersTab />
+                </TabsContent>
+            </Tabs>
         </div>
+    )
+}
+
+function InactiveUsersTab() {
+    const [days, setDays] = useState(7)
+    const navigate = useNavigate()
+
+    const { data, isLoading } = useQuery({
+        queryKey: ['attendances', 'inactive-users', days],
+        queryFn: () => attendanceService.getInactiveUsers(days),
+    })
+
+    const DAY_OPTIONS = [3, 5, 7, 10]
+
+    return (
+        <>
+            <Card>
+                <CardHeader className="border-b border-slate-200 bg-slate-50/50">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <CardTitle className="text-slate-900 flex items-center gap-2">
+                                <UserX className="h-5 w-5 text-amber-600" />
+                                Inactive Users
+                            </CardTitle>
+                            <CardDescription className="mt-1">
+                                Users who have missed at least this many consecutive days. Used to follow up or send absence reminders.
+                            </CardDescription>
+                        </div>
+                        <div className="flex items-center gap-2 w-full sm:w-48">
+                            <Label htmlFor="inactive-days" className="text-sm whitespace-nowrap">Min. missed days</Label>
+                            <Select value={String(days)} onValueChange={(v) => setDays(Number(v))}>
+                                <SelectTrigger id="inactive-days">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {DAY_OPTIONS.map((d) => (
+                                        <SelectItem key={d} value={String(d)}>{d} days</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                    {isLoading ? (
+                        <div className="p-6 space-y-3">
+                            {[...Array(4)].map((_, i) => (
+                                <Skeleton key={i} className="h-14 bg-slate-100" />
+                            ))}
+                        </div>
+                    ) : data?.users && data.users.length > 0 ? (
+                        <>
+                            <div className="hidden md:block overflow-x-auto">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="hover:bg-transparent border-slate-200 bg-slate-50/30">
+                                            <TableHead className="text-slate-700 font-semibold">User</TableHead>
+                                            <TableHead className="text-slate-700 font-semibold">Contact</TableHead>
+                                            <TableHead className="text-slate-700 font-semibold">Missed days</TableHead>
+                                            <TableHead className="text-slate-700 font-semibold">Last attended</TableHead>
+                                            <TableHead className="text-slate-700 font-semibold">Reminders</TableHead>
+                                            <TableHead className="text-right text-slate-700 font-semibold">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {data.users.map((u) => (
+                                            <TableRow key={u.id} className="border-slate-200 hover:bg-slate-50/50">
+                                                <TableCell>
+                                                    <div>
+                                                        <p className="font-medium text-slate-900">{u.name}</p>
+                                                        <p className="text-xs text-slate-500">{u.user_name ? `@${u.user_name}` : u.email}</p>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="text-sm">
+                                                        <p className="text-slate-900">{u.phone}</p>
+                                                        <p className="text-xs text-slate-500">{u.email}</p>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge variant="secondary">{u.consecutive_missed_days} days</Badge>
+                                                </TableCell>
+                                                <TableCell className="text-slate-600">
+                                                    {u.last_attended_at ? formatDate(u.last_attended_at) : '—'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {u.send_absence_reminders ? (
+                                                        <Badge className="bg-green-600">On</Badge>
+                                                    ) : (
+                                                        <Badge variant="outline">Off</Badge>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => navigate(`/users/${u.id}`)}
+                                                    >
+                                                        <Eye className="h-4 w-4 mr-1" />
+                                                        View
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                            <div className="md:hidden divide-y divide-slate-200">
+                                {data.users.map((u) => (
+                                    <div key={u.id} className="p-4 hover:bg-slate-50/50">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div>
+                                                <p className="font-medium text-slate-900">{u.name}</p>
+                                                <p className="text-xs text-slate-500">{u.user_name ? `@${u.user_name}` : u.email}</p>
+                                            </div>
+                                            <Badge variant="secondary">{u.consecutive_missed_days} days</Badge>
+                                        </div>
+                                        <div className="text-sm text-slate-600 space-y-1 mb-3">
+                                            <p>Last attended: {u.last_attended_at ? formatDate(u.last_attended_at) : '—'}</p>
+                                            <p>Reminders: {u.send_absence_reminders ? 'On' : 'Off'}</p>
+                                        </div>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full"
+                                            onClick={() => navigate(`/users/${u.id}`)}
+                                        >
+                                            <Eye className="h-4 w-4 mr-1" />
+                                            View user
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="px-4 sm:px-6 py-3 border-t border-slate-200 bg-slate-50/30 text-sm text-slate-600">
+                                {data.total} user{data.total !== 1 ? 's' : ''} inactive for {data.days}+ consecutive days
+                            </div>
+                        </>
+                    ) : (
+                        <div className="p-12 text-center text-slate-500">
+                            <UserX className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+                            <p className="font-medium">No inactive users</p>
+                            <p className="text-sm mt-1">No users have missed {data?.days ?? days}+ consecutive days.</p>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+        </>
     )
 }

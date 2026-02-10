@@ -11,6 +11,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { DatePicker } from '@/components/ui/calendar'
+import { Info } from 'lucide-react'
 import type { User, CreateUserData } from '@/lib/users'
 
 const DAYS_OF_WEEK = [
@@ -102,6 +103,12 @@ export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps)
                             placeholder="Enter user name"
                             required
                         />
+                        {user && (
+                            <p className="flex items-center gap-1.5 text-xs text-slate-500">
+                                <Info className="h-3.5 w-3.5 shrink-0" />
+                                Changing this will affect Zoom tracking for this user.
+                            </p>
+                        )}
                     </div>
 
                     {/* Email */}
