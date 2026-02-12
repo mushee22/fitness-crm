@@ -266,18 +266,18 @@ export function SessionDetailsPage() {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {session.zoom_join_url && (
-                                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 flex items-start gap-3">
-                                        <div className="p-2 bg-blue-100 rounded-lg">
-                                            <Video className="h-5 w-5 text-blue-600" />
+                                    <div className="p-4 bg-primary/10 rounded-lg border border-primary/20 flex items-start gap-3">
+                                        <div className="p-2 bg-primary/20 rounded-lg">
+                                            <Video className="h-5 w-5 text-primary" />
                                         </div>
                                         <div className="flex-1 overflow-hidden space-y-2">
                                             <div>
                                                 <h4 className="font-semibold text-blue-900">Zoom Meeting</h4>
-                                                <p className="text-sm text-blue-700">
+                                                <p className="text-sm text-primary">
                                                     ID: {session.zoom_meeting_id}
                                                 </p>
                                                 {session.zoom_metadata?.password && (
-                                                    <p className="text-sm text-blue-700">
+                                                    <p className="text-sm text-primary">
                                                         Password: {session.zoom_metadata.password}
                                                     </p>
                                                 )}
@@ -289,7 +289,7 @@ export function SessionDetailsPage() {
                                                         href={session.zoom_metadata.start_url}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="text-sm font-medium text-blue-700 hover:text-blue-900 hover:underline bg-blue-100/50 px-3 py-1.5 rounded-md border border-blue-200"
+                                                        className="text-sm font-medium text-primary hover:text-slate-900 hover:underline bg-primary/10 px-3 py-1.5 rounded-md border border-primary/20"
                                                     >
                                                         Start Meeting (Host)
                                                     </a>
@@ -298,7 +298,7 @@ export function SessionDetailsPage() {
                                                     href={session.zoom_join_url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-md transition-colors"
+                                                    className="text-sm font-medium text-white bg-primary hover:bg-primary/90 px-3 py-1.5 rounded-md transition-colors"
                                                 >
                                                     Join Meeting
                                                 </a>
@@ -306,7 +306,7 @@ export function SessionDetailsPage() {
                                                     type="button"
                                                     variant="outline"
                                                     size="sm"
-                                                    className="text-blue-700 border-blue-200 hover:bg-blue-100/50"
+                                                    className="text-primary border-primary/20 hover:bg-primary/10"
                                                     onClick={() => {
                                                         navigator.clipboard.writeText(session.zoom_join_url!)
                                                         toast.success('Join link copied to clipboard')
@@ -359,7 +359,7 @@ export function SessionDetailsPage() {
                                 <Card>
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                         <CardTitle className="text-sm font-medium">Avg Duration</CardTitle>
-                                        <Clock className="h-4 w-4 text-blue-500" />
+                                        <Clock className="h-4 w-4 text-primary" />
                                     </CardHeader>
                                     <CardContent>
                                         <div className="text-2xl font-bold">

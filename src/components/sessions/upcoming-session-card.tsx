@@ -18,12 +18,12 @@ export function UpcomingSessionCard({ session, onJoin, onViewDetails }: Upcoming
 
     return (
         <Card className="flex flex-col h-full hover:shadow-md transition-shadow duration-200 border-slate-200 overflow-hidden group">
-            <div className="h-2 bg-linear-to-r from-blue-500 to-indigo-600" />
+            <div className="h-2 bg-linear-to-r from-primary-500 to-primary-700" />
             <CardHeader className="p-5 pb-2">
                 <div className="flex justify-between items-start gap-4">
                     <div className="space-y-1">
                         {isToday && (
-                            <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 mb-2">
+                            <Badge variant="secondary" className="bg-primary/15 text-primary-foreground hover:bg-primary/25 mb-2">
                                 Today
                             </Badge>
                         )}

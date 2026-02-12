@@ -252,7 +252,7 @@ export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps)
                                 type="button"
                                 onClick={() => toggleDay(day)}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${formData.availability_days.includes(day)
-                                    ? 'bg-blue-600 text-white shadow-sm'
+                                    ? 'bg-primary text-primary-foreground shadow-sm'
                                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                                     }`}
                             >

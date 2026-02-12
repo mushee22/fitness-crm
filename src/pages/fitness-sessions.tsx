@@ -250,13 +250,13 @@ export function FitnessSessionsPage() {
                                                 >
                                                     <TableCell>
                                                         <div className="flex items-center gap-3">
-                                                            <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                                                <CalendarIcon className="h-5 w-5 text-blue-600" />
+                                                            <div className="h-10 w-10 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
+                                                                <CalendarIcon className="h-5 w-5 text-primary" />
                                                             </div>
                                                             <div>
                                                                 <button
                                                                     onClick={() => navigate(`/fitness-sessions/${session.id}`)}
-                                                                    className="font-medium text-slate-900 hover:text-blue-600 hover:underline transition-colors text-left"
+                                                                    className="font-medium text-slate-900 hover:text-primary hover:underline transition-colors text-left"
                                                                 >
                                                                     {session.title}
                                                                 </button>
@@ -291,7 +291,7 @@ export function FitnessSessionsPage() {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="h-9 w-9 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                                                className="h-9 w-9 hover:bg-primary/15 hover:text-primary transition-colors"
                                                                 onClick={() => navigate(`/fitness-sessions/${session.id}`)}
                                                             >
                                                                 <Eye className="h-4 w-4" />
@@ -333,8 +333,8 @@ export function FitnessSessionsPage() {
                                     filteredSessions?.map((session) => (
                                         <div key={session.id} className="p-4 hover:bg-slate-50/50 transition-colors">
                                             <div className="flex items-start gap-3 mb-3">
-                                                <div className="h-12 w-12 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                                    <CalendarIcon className="h-6 w-6 text-blue-600" />
+                                                <div className="h-12 w-12 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
+                                                    <CalendarIcon className="h-6 w-6 text-primary" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <h3 className="font-medium text-slate-900">{session.title}</h3>

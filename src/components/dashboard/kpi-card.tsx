@@ -25,8 +25,8 @@ export function KPICard({ title, value, change, icon: Icon, index = 0 }: KPICard
                     <CardTitle className="text-sm font-medium text-slate-600">
                         {title}
                     </CardTitle>
-                    <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                        <Icon className="h-4 w-4 text-blue-600" />
+                    <div className="h-8 w-8 rounded-lg bg-primary/15 flex items-center justify-center">
+                        <Icon className="h-4 w-4 text-primary" />
                     </div>
                 </CardHeader>
                 <CardContent>

@@ -1,43 +1,53 @@
 @import 'tailwindcss';
 @import 'react-day-picker/style.css';
 
-/* Clean Admin Dashboard Theme - Light Only */
+/* Gym / CrossFit Admin Theme - based on brand logo (lime green, dark grey, white) */
 @theme {
-  /* Background Colors */
-  --color-background: #f8fafc;
-  --color-foreground: #0f172a;
+  /* Background & surfaces - clean white / off-white */
+  --color-background: #fafafa;
+  --color-foreground: #222222;
   --color-card: #ffffff;
-  --color-card-foreground: #0f172a;
+  --color-card-foreground: #222222;
   --color-popover: #ffffff;
-  --color-popover-foreground: #0f172a;
-  
-  /* Primary - Blue */
-  --color-primary: #2563eb;
-  --color-primary-foreground: #ffffff;
-  
-  /* Secondary - Light Gray */
+  --color-popover-foreground: #222222;
+
+  /* Primary - lime green from logo (barbell plates & "Fit" text) */
+  --color-primary: #9ACD32;
+  --color-primary-foreground: #222222;
+  --color-primary-50: #f5fce8;
+  --color-primary-100: #e8f9c5;
+  --color-primary-200: #d4f59e;
+  --color-primary-300: #b8eb6a;
+  --color-primary-400: #9ACD32;
+  --color-primary-500: #8bc02a;
+  --color-primary-600: #7ab320;
+  --color-primary-700: #659618;
+  --color-primary-800: #527a14;
+  --color-primary-900: #435e12;
+
+  /* Secondary - light grey tint */
   --color-secondary: #f1f5f9;
-  --color-secondary-foreground: #0f172a;
-  
-  /* Muted - Subtle Gray */
+  --color-secondary-foreground: #222222;
+
+  /* Muted */
   --color-muted: #f8fafc;
   --color-muted-foreground: #64748b;
-  
+
   /* Accent */
-  --color-accent: #f1f5f9;
-  --color-accent-foreground: #0f172a;
-  
+  --color-accent: #f0f9e8;
+  --color-accent-foreground: #222222;
+
   /* Status Colors */
   --color-destructive: #dc2626;
   --color-destructive-foreground: #ffffff;
   --color-success: #16a34a;
   --color-warning: #f59e0b;
-  
-  /* Borders */
-  --color-border: #e2e8f0;
-  --color-input: #e2e8f0;
-  --color-ring: #2563eb;
-  
+
+  /* Borders - subtle grey */
+  --color-border: #e5e7eb;
+  --color-input: #e5e7eb;
+  --color-ring: #9ACD32;
+
   /* Radius */
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;

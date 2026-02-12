@@ -170,7 +170,7 @@ export function UserDetailsPage() {
                     </Button>
                     <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
                         <Avatar className="h-12 w-12 sm:h-16 sm:w-16 border-2 border-slate-200 shrink-0">
-                            <AvatarFallback className="bg-blue-100 text-blue-700 text-lg sm:text-xl font-semibold">
+                            <AvatarFallback className="bg-primary/20 text-primary-foreground text-lg sm:text-xl font-semibold">
                                 {getInitials(user.name)}
                             </AvatarFallback>
                         </Avatar>
@@ -243,14 +243,14 @@ export function UserDetailsPage() {
                         <Card className="border-slate-200 shadow-sm">
                             <CardHeader className="border-b border-slate-200 bg-slate-50/50">
                                 <CardTitle className="text-base sm:text-lg text-slate-900 flex items-center gap-2">
-                                    <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                                    <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                                     Contact Information
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="pt-4 sm:pt-6 space-y-3 sm:space-y-4">
                                 <div className="flex items-start gap-3">
-                                    <div className="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                                        <Mail className="h-5 w-5 text-blue-600" />
+                                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                                        <Mail className="h-5 w-5 text-primary" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-xs sm:text-sm font-medium text-slate-500">Email Address</p>
@@ -357,7 +357,7 @@ export function UserDetailsPage() {
                         <Card className="border-slate-200 shadow-sm">
                             <CardHeader className="border-b border-slate-200 bg-slate-50/50">
                                 <CardTitle className="text-base sm:text-lg text-slate-900 flex items-center gap-2">
-                                    <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                                    <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                                     Availability Schedule
                                 </CardTitle>
                             </CardHeader>
@@ -368,7 +368,7 @@ export function UserDetailsPage() {
                                         <Badge
                                             key={day}
                                             variant="secondary"
-                                            className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm bg-blue-50 text-blue-700 border-blue-200"
+                                            className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm bg-primary/10 text-primary border-primary/20"
                                         >
                                             {day.charAt(0).toUpperCase() + day.slice(1)}
                                         </Badge>
@@ -412,10 +412,10 @@ export function UserDetailsPage() {
                                         </p>
                                     </CardContent>
                                 </Card>
-                                <Card className="bg-blue-50 border-blue-100">
+                                <Card className="bg-primary/10 border-primary/15">
                                     <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-                                        <p className="text-xs text-blue-600 font-medium uppercase tracking-wider">Avg Duration</p>
-                                        <p className="text-2xl font-bold text-blue-700 mt-1">
+                                        <p className="text-xs text-primary font-medium uppercase tracking-wider">Avg Duration</p>
+                                        <p className="text-2xl font-bold text-primary mt-1">
                                             {loadingStats ? <Skeleton className="h-8 w-16" /> : `${Math.round(attendanceStats?.statistics.average_attendance_duration || 0)}m`}
                                         </p>
                                     </CardContent>
@@ -458,7 +458,7 @@ export function UserDetailsPage() {
                                                             <span className="font-medium">{record.fitness_session?.title || `Session #${record.fitness_session_id}`}</span>
                                                             <Link
                                                                 to={`/fitness-sessions/${record.fitness_session_id}`}
-                                                                className="text-xs text-blue-600 hover:underline"
+                                                                className="text-xs text-primary hover:underline"
                                                                 onClick={(e) => e.stopPropagation()}
                                                             >
                                                                 View Session
@@ -593,7 +593,7 @@ export function UserDetailsPage() {
                                                 <p className="text-sm text-slate-500 line-clamp-1">{item.diet_plan.description}</p>
                                                 <div className="text-xs text-slate-500 flex items-center gap-4 mt-2">
                                                     <div className="flex items-center gap-1">
-                                                        <span className="font-medium text-blue-600">P: {item.diet_plan.macronutrients?.protein || 0}g</span>
+                                                        <span className="font-medium text-primary">P: {item.diet_plan.macronutrients?.protein || 0}g</span>
                                                     </div>
                                                     <div className="flex items-center gap-1">
                                                         <span className="font-medium text-amber-600">C: {item.diet_plan.macronutrients?.carbs || 0}g</span>

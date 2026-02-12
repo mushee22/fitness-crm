@@ -41,8 +41,8 @@ export function CreateUserPage() {
                 </Button>
                 <div className="flex-1">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                        <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <UserPlus className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+                        <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                            <UserPlus className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
                             <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">Add New Member</h1>

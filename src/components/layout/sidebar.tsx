@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import {
@@ -79,7 +78,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 className={cn(
                                     'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                                     isActive
-                                        ? 'bg-blue-50 text-blue-700'
+                                        ? 'bg-primary/15 text-primary-foreground'
                                         : 'text-slate-700 hover:bg-slate-100'
                                 )}
                             >

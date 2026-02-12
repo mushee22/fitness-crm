@@ -44,7 +44,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-slate-100">
                             <Avatar className="h-9 w-9">
-                                <AvatarFallback className="bg-blue-100 text-blue-700 text-sm font-medium">
+                                <AvatarFallback className="bg-primary/20 text-primary-foreground text-sm font-medium">
                                     {user ? getInitials(user.name) : 'AD'}
                                 </AvatarFallback>
                             </Avatar>

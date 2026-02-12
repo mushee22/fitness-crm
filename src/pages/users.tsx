@@ -128,7 +128,7 @@ export function UsersPage() {
                                                         <TableCell>
                                                             <div className="flex items-center gap-3">
                                                                 <Avatar className="h-10 w-10 border-2 border-slate-200">
-                                                                    <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold">
+                                                                    <AvatarFallback className="bg-primary/20 text-primary-foreground font-semibold">
                                                                         {getInitials(user.name)}
                                                                     </AvatarFallback>
                                                                 </Avatar>
@@ -160,7 +160,7 @@ export function UsersPage() {
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="icon"
-                                                                    className="h-9 w-9 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                                                    className="h-9 w-9 hover:bg-primary/15 hover:text-primary transition-colors"
                                                                     onClick={() => navigate(`/users/${user.id}`)}
                                                                 >
                                                                     <Eye className="h-4 w-4" />
@@ -203,7 +203,7 @@ export function UsersPage() {
                                             <div key={user.id} className="p-4 hover:bg-slate-50/50 transition-colors">
                                                 <div className="flex items-start gap-3 mb-3">
                                                     <Avatar className="h-12 w-12 border-2 border-slate-200">
-                                                        <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold">
+                                                        <AvatarFallback className="bg-primary/20 text-primary-foreground font-semibold">
                                                             {getInitials(user.name)}
                                                         </AvatarFallback>
                                                     </Avatar>

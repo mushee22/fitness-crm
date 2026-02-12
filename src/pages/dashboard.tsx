@@ -250,10 +250,20 @@ export function DashboardPage() {
                     ) : (
                         <ChartCard
                             title="Daily Participation"
-                            data={dashboardData?.daily_participation.map(d => ({
-                                name: format(new Date(d.date), 'MMM d'),
-                                value: d.participation_count
-                            })) || []}
+                            data={(() => {
+                                const raw = dashboardData?.daily_participation || []
+                                const byDate = new Map<string, number>()
+                                raw.forEach((d) => {
+                                    const key = d.date.split('T')[0]
+                                    byDate.set(key, (byDate.get(key) || 0) + (d.participation_count ?? 0))
+                                })
+                                return Array.from(byDate.entries())
+                                    .sort(([a], [b]) => a.localeCompare(b))
+                                    .map(([dateStr, value]) => ({
+                                        name: format(new Date(dateStr), 'MMM d'),
+                                        value,
+                                    }))
+                            })()}
                             type="bar"
                         />
                     )}
