@@ -1,4 +1,4 @@
-import { Bell, Menu, User, LogOut, Moon, Sun } from 'lucide-react'
+import { Menu, LogOut, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
     DropdownMenu,
@@ -50,11 +50,6 @@ export function Navbar({ onMenuClick }: NavbarProps) {
                         <Moon className="h-5 w-5 text-slate-600" />
                     )}
                 </Button>
-                {/* Notifications */}
-                <Button variant="ghost" size="icon" className="hover:bg-slate-100 dark:hover:bg-slate-800">
-                    <Bell className="h-5 w-5 text-slate-600 dark:text-slate-300" />
-                </Button>
-
                 {/* User Menu */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -78,11 +73,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
                             </div>
                         </div>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            <User className="mr-2 h-4 w-4" />
-                            Profile
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>Settings</DropdownMenuItem>
+                        {/* <DropdownMenuItem>Settings</DropdownMenuItem> */}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={logout} className="text-red-600 dark:text-red-400">
                             <LogOut className="mr-2 h-4 w-4" />
