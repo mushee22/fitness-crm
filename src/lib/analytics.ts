@@ -60,11 +60,13 @@ export interface DropoutAnalyticsResponse {
     dropout_patterns: {
         missed_3_days: number
         missed_5_days: number
+        missed_7_days: number
         missed_9_days: number
         missed_10_days: number
     }
     users_missed_3_days: DropoutUser[]
     users_missed_5_days: DropoutUser[]
+    users_missed_7_days: DropoutUser[]
     users_missed_9_days: DropoutUser[]
     users_missed_10_days: DropoutUser[]
 }

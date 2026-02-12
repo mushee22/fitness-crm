@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import {
@@ -8,7 +9,6 @@ import {
     ClipboardList,
     Calendar as CalendarIcon,
     Utensils,
-    MessageCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -19,7 +19,6 @@ const navigation = [
     { name: 'Upcoming Sessions', href: '/upcoming-sessions', icon: CalendarIcon },
     { name: 'Attendance', href: '/attendance', icon: ClipboardList },
     { name: 'Diet Plans', href: '/diet-plans', icon: Utensils },
-    { name: 'Bulk Message', href: '/bulk-message', icon: MessageCircle },
 ]
 
 interface SidebarProps {
@@ -49,9 +48,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             >
                 {/* Logo */}
                 <div className="flex h-16 items-center justify-between px-4 border-b border-slate-200">
-                    <h1 className="text-xl font-semibold text-slate-900">
-                        Rishus CrossFit
-                    </h1>
+                    <div className="flex items-center gap-2 min-w-0">
+                        <img
+                            src="/assets/crossfit-logo.jpg"
+                            alt="Logo"
+                            className="h-9 w-9 object-contain shrink-0"
+                        />
+                        <span className="text-xl font-semibold text-slate-900 truncate">Rishus Crossfit</span>
+                    </div>
                     <Button
                         variant="ghost"
                         size="icon"
@@ -87,10 +91,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </nav>
 
                 {/* Footer */}
-                <div className="border-t border-slate-200 p-4">
+                <div className="border-t border-slate-200 p-4 space-y-2">
                     <p className="text-xs text-slate-500">
                         © {new Date().getFullYear()} Rishus CrossFit
                     </p>
+                   
                 </div>
             </div>
         </>
