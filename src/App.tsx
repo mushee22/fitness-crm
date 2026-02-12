@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/query-client'
 import { AuthProvider } from './contexts/auth-context'
+import { ThemeProvider } from './contexts/theme-context'
 import { ProtectedRoute } from './components/auth/protected-route'
 import { DashboardLayout } from './components/layout/dashboard-layout'
 import { Toaster } from './components/ui/toaster'
@@ -28,8 +29,9 @@ import { BulkMessagePage } from './pages/bulk-message'
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <BrowserRouter>
+      <ThemeProvider>
+        <AuthProvider>
+          <BrowserRouter>
           <Routes>
             {/* Public Route */}
             <Route path="/login" element={<LoginPage />} />
@@ -83,8 +85,9 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <Toaster position="top-right" richColors />
-        </BrowserRouter>
-      </AuthProvider>
+          </BrowserRouter>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   )
 }

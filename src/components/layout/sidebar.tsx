@@ -41,27 +41,27 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             {/* Sidebar */}
             <div
                 className={cn(
-                    'fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-white border-r border-slate-200 transition-transform duration-300 lg:static lg:translate-x-0',
+                    'fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 transition-transform duration-300 lg:static lg:translate-x-0',
                     isOpen ? 'translate-x-0' : '-translate-x-full'
                 )}
             >
                 {/* Logo */}
-                <div className="flex h-16 items-center justify-between px-4 border-b border-slate-200">
+                <div className="flex h-16 items-center justify-between px-4 border-b border-slate-200 dark:border-slate-700">
                     <div className="flex items-center gap-2 min-w-0">
                         <img
                             src="/assets/crossfit-logo.jpg"
                             alt="Logo"
                             className="h-9 w-9 object-contain shrink-0"
                         />
-                        <span className="text-xl font-semibold text-slate-900 truncate">Rishus Crossfit</span>
+                        <span className="text-xl font-semibold text-slate-900 dark:text-slate-100 truncate">Rishus Crossfit</span>
                     </div>
                     <Button
                         variant="ghost"
                         size="icon"
                         onClick={onClose}
-                        className="lg:hidden hover:bg-slate-100"
+                        className="lg:hidden hover:bg-slate-100 dark:hover:bg-slate-800"
                     >
-                        <X className="h-5 w-5 text-slate-600" />
+                        <X className="h-5 w-5 text-slate-600 dark:text-slate-300" />
                     </Button>
                 </div>
 
@@ -78,8 +78,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 className={cn(
                                     'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                                     isActive
-                                        ? 'bg-primary/15 text-primary-foreground'
-                                        : 'text-slate-700 hover:bg-slate-100'
+                                        ? 'bg-primary/15 text-primary-foreground dark:bg-primary/25'
+                                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                                 )}
                             >
                                 <item.icon className="h-5 w-5 shrink-0" />
@@ -90,8 +90,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </nav>
 
                 {/* Footer */}
-                <div className="border-t border-slate-200 p-4 space-y-2">
-                    <p className="text-xs text-slate-500">
+                <div className="border-t border-slate-200 dark:border-slate-700 p-4 space-y-2">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                         © {new Date().getFullYear()} Rishus CrossFit
                     </p>
                    

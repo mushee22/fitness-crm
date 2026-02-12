@@ -80,8 +80,8 @@ export function FitnessSessionsPage() {
         <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 className="text-xl sm:text-2xl font-semibold text-slate-900">Fitness Sessions</h1>
-                    <p className="text-sm sm:text-base text-slate-600 mt-1">Manage training sessions and schedules</p>
+                    <h1 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-slate-100">Fitness Sessions</h1>
+                    <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1">Manage training sessions and schedules</p>
                 </div>
                 <Button onClick={() => navigate('/fitness-sessions/create')} className="shadow-sm w-full sm:w-auto">
                     <Plus className="h-4 w-4 mr-2" />
@@ -89,24 +89,24 @@ export function FitnessSessionsPage() {
                 </Button>
             </div>
 
-            <Card className="border-slate-200 shadow-sm">
-                <CardHeader className="border-b border-slate-200 bg-slate-50/50">
+            <Card className="border-slate-200 dark:border-slate-700 shadow-sm">
+                <CardHeader className="border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <CardTitle className="text-slate-900">All Sessions</CardTitle>
+                        <CardTitle className="text-slate-900 dark:text-slate-100">All Sessions</CardTitle>
                         <div className="relative w-full sm:w-80">
-                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
                             <Input
                                 placeholder="Search sessions..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 bg-white"
+                                className="pl-9 bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100 placeholder:dark:text-slate-400"
                             />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div className="flex flex-col gap-2">
-                            <span className="text-sm font-medium text-slate-700">Specific Date</span>
+                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Specific Date</span>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -137,7 +137,7 @@ export function FitnessSessionsPage() {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <span className="text-sm font-medium text-slate-700">From Date</span>
+                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">From Date</span>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -164,7 +164,7 @@ export function FitnessSessionsPage() {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <span className="text-sm font-medium text-slate-700">To Date</span>
+                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">To Date</span>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -202,7 +202,7 @@ export function FitnessSessionsPage() {
                                     setSpecificDate(undefined)
                                     setPage(1)
                                 }}
-                                className="text-slate-500 hover:text-slate-900"
+                                className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
                             >
                                 Clear Date Filters
                             </Button>
@@ -213,7 +213,7 @@ export function FitnessSessionsPage() {
                     {isLoading ? (
                         <div className="p-4 sm:p-6 space-y-3">
                             {[...Array(5)].map((_, i) => (
-                                <Skeleton key={i} className="h-20 bg-slate-100" />
+                                <Skeleton key={i} className="h-20 bg-slate-100 dark:bg-slate-700" />
                             ))}
                         </div>
                     ) : (
@@ -222,21 +222,21 @@ export function FitnessSessionsPage() {
                             <div className="hidden md:block overflow-x-auto">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow className="hover:bg-transparent border-slate-200 bg-slate-50/30">
-                                            <TableHead className="text-slate-700 font-semibold">Session</TableHead>
-                                            <TableHead className="text-slate-700 font-semibold">Status</TableHead>
-                                            <TableHead className="text-slate-700 font-semibold">Date</TableHead>
-                                            <TableHead className="text-slate-700 font-semibold">Time</TableHead>
-                                            <TableHead className="text-slate-700 font-semibold">Participants</TableHead>
-                                            <TableHead className="text-right text-slate-700 font-semibold">Actions</TableHead>
+                                        <TableRow className="hover:bg-transparent border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/50">
+                                            <TableHead className="text-slate-700 dark:text-slate-300 font-semibold">Session</TableHead>
+                                            <TableHead className="text-slate-700 dark:text-slate-300 font-semibold">Status</TableHead>
+                                            <TableHead className="text-slate-700 dark:text-slate-300 font-semibold">Date</TableHead>
+                                            <TableHead className="text-slate-700 dark:text-slate-300 font-semibold">Time</TableHead>
+                                            <TableHead className="text-slate-700 dark:text-slate-300 font-semibold">Participants</TableHead>
+                                            <TableHead className="text-right text-slate-700 dark:text-slate-300 font-semibold">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {filteredSessions?.length === 0 ? (
                                             <TableRow>
                                                 <TableCell colSpan={6} className="h-32 text-center">
-                                                    <div className="flex flex-col items-center justify-center text-slate-500">
-                                                        <CalendarIcon className="h-12 w-12 mb-2 text-slate-300" />
+                                                    <div className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400">
+                                                        <CalendarIcon className="h-12 w-12 mb-2 text-slate-300 dark:text-slate-500" />
                                                         <p className="font-medium">No sessions found</p>
                                                         <p className="text-sm">Create your first session to get started</p>
                                                     </div>
@@ -246,7 +246,7 @@ export function FitnessSessionsPage() {
                                             filteredSessions?.map((session) => (
                                                 <TableRow
                                                     key={session.id}
-                                                    className="border-slate-200 hover:bg-slate-50/50 transition-colors"
+                                                    className="border-slate-200 dark:border-slate-700 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
                                                 >
                                                     <TableCell>
                                                         <div className="flex items-center gap-3">
@@ -256,7 +256,7 @@ export function FitnessSessionsPage() {
                                                             <div>
                                                                 <button
                                                                     onClick={() => navigate(`/fitness-sessions/${session.id}`)}
-                                                                    className="font-medium text-slate-900 hover:text-primary hover:underline transition-colors text-left"
+                                                                    className="font-medium text-slate-900 dark:text-slate-100 hover:text-primary hover:underline transition-colors text-left"
                                                                 >
                                                                     {session.title}
                                                                 </button>
@@ -271,19 +271,19 @@ export function FitnessSessionsPage() {
                                                     <TableCell>
                                                         {getSessionStatusBadge(session.session_status) ?? '—'}
                                                     </TableCell>
-                                                    <TableCell className="text-slate-900">
+                                                    <TableCell className="text-slate-900 dark:text-slate-100">
                                                         {formatDate(session.date)}
                                                     </TableCell>
                                                     <TableCell>
-                                                        <div className="flex items-center gap-1 text-slate-900">
-                                                            <Clock className="h-4 w-4 text-slate-400" />
+                                                        <div className="flex items-center gap-1 text-slate-900 dark:text-slate-100">
+                                                            <Clock className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                                                             {format(new Date(session.start_time), 'h:mm a')} - {format(new Date(session.end_time), 'h:mm a')}
                                                         </div>
                                                     </TableCell>
                                                     <TableCell>
                                                         <div className="flex items-center gap-1">
-                                                            <Users className="h-4 w-4 text-slate-400" />
-                                                            <span className="text-slate-900">{session.attendances?.length ?? 0}</span>
+                                                            <Users className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                                                            <span className="text-slate-900 dark:text-slate-100">{session.attendances?.length ?? 0}</span>
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="text-right">
@@ -299,7 +299,7 @@ export function FitnessSessionsPage() {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="h-9 w-9 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                                                                className="h-9 w-9 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
                                                                 onClick={() => navigate(`/fitness-sessions/${session.id}/edit`)}
                                                             >
                                                                 <Edit className="h-4 w-4" />
@@ -307,7 +307,7 @@ export function FitnessSessionsPage() {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="h-9 w-9 hover:bg-red-50 hover:text-red-600 transition-colors"
+                                                                className="h-9 w-9 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                                                                 onClick={() => setDeletingSession(session)}
                                                             >
                                                                 <Trash2 className="h-4 w-4" />
@@ -322,23 +322,23 @@ export function FitnessSessionsPage() {
                             </div>
 
                             {/* Mobile Card View */}
-                            <div className="md:hidden divide-y divide-slate-200">
+                            <div className="md:hidden divide-y divide-slate-200 dark:divide-slate-700">
                                 {filteredSessions?.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center text-slate-500 py-12">
-                                        <CalendarIcon className="h-12 w-12 mb-2 text-slate-300" />
+                                    <div className="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 py-12">
+                                        <CalendarIcon className="h-12 w-12 mb-2 text-slate-300 dark:text-slate-500" />
                                         <p className="font-medium">No sessions found</p>
                                         <p className="text-sm">Create your first session to get started</p>
                                     </div>
                                 ) : (
                                     filteredSessions?.map((session) => (
-                                        <div key={session.id} className="p-4 hover:bg-slate-50/50 transition-colors">
+                                        <div key={session.id} className="p-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                                             <div className="flex items-start gap-3 mb-3">
                                                 <div className="h-12 w-12 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
                                                     <CalendarIcon className="h-6 w-6 text-primary" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className="font-medium text-slate-900">{session.title}</h3>
-                                                    <p className="text-sm text-slate-500">{formatDate(session.date)}</p>
+                                                    <h3 className="font-medium text-slate-900 dark:text-slate-100">{session.title}</h3>
+                                                    <p className="text-sm text-slate-500 dark:text-slate-400">{formatDate(session.date)}</p>
                                                     <div className="mt-1">
                                                         {getSessionStatusBadge(session.session_status)}
                                                     </div>
@@ -346,14 +346,14 @@ export function FitnessSessionsPage() {
                                             </div>
                                             <div className="grid grid-cols-2 gap-2 text-sm mb-3">
                                                 <div>
-                                                    <p className="text-slate-500 text-xs">Time</p>
-                                                    <p className="text-slate-900">
+                                                    <p className="text-slate-500 dark:text-slate-400 text-xs">Time</p>
+                                                    <p className="text-slate-900 dark:text-slate-100">
                                                         {format(new Date(session.start_time), 'h:mm a')} - {format(new Date(session.end_time), 'h:mm a')}
                                                     </p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-slate-500 text-xs">Participants</p>
-                                                    <p className="text-slate-900">{session.attendances?.length ?? 0} users</p>
+                                                    <p className="text-slate-500 dark:text-slate-400 text-xs">Participants</p>
+                                                    <p className="text-slate-900 dark:text-slate-100">{session.attendances?.length ?? 0} users</p>
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
@@ -379,7 +379,7 @@ export function FitnessSessionsPage() {
                                                     variant="outline"
                                                     size="sm"
                                                     onClick={() => setDeletingSession(session)}
-                                                    className="text-red-600 hover:text-red-700"
+                                                    className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
@@ -391,8 +391,8 @@ export function FitnessSessionsPage() {
 
                             {/* Pagination */}
                             {data && data.last_page > 1 && (
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/30">
-                                    <p className="text-sm text-slate-600 text-center sm:text-left">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 sm:px-6 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/30">
+                                    <p className="text-sm text-slate-600 dark:text-slate-400 text-center sm:text-left">
                                         Page {data.current_page} of {data.last_page} ({data.total} total)
                                     </p>
                                     <div className="flex gap-2 justify-center sm:justify-end">

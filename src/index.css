@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @import 'react-day-picker/style.css';
 
+/* Class-based dark mode (toggle with .dark on html) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Gym / CrossFit Admin Theme - based on brand logo (lime green, dark grey, white) */
 @theme {
   /* Background & surfaces - clean white / off-white */
@@ -65,4 +68,22 @@ body {
   font-feature-settings: "rlig" 1, "calt" 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dark mode variable overrides */
+.dark {
+  --color-background: #0f172a;
+  --color-foreground: #f1f5f9;
+  --color-card: #1e293b;
+  --color-card-foreground: #f1f5f9;
+  --color-popover: #1e293b;
+  --color-popover-foreground: #f1f5f9;
+  --color-secondary: #334155;
+  --color-secondary-foreground: #f1f5f9;
+  --color-muted: #1e293b;
+  --color-muted-foreground: #94a3b8;
+  --color-accent: #334155;
+  --color-accent-foreground: #f1f5f9;
+  --color-border: #334155;
+  --color-input: #334155;
 }

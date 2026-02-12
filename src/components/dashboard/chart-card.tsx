@@ -23,14 +23,14 @@ export function ChartCard({ title, data, type = 'line' }: ChartCardProps) {
     const chartHeight = 300
 
     return (
-        <Card className="border-slate-200">
+        <Card className="border-slate-200 dark:border-slate-700">
             <CardHeader>
-                <CardTitle className="text-slate-900">{title}</CardTitle>
+                <CardTitle className="text-slate-900 dark:text-slate-100">{title}</CardTitle>
             </CardHeader>
             <CardContent>
                 <div style={{ width: '100%', height: chartHeight, minHeight: chartHeight }}>
                     {!hasData ? (
-                        <div className="flex flex-col items-center justify-center h-full text-slate-500 text-sm">
+                        <div className="flex flex-col items-center justify-center h-full text-slate-500 dark:text-slate-400 text-sm">
                             <p className="font-medium">No participation data</p>
                             <p className="mt-1">Select a date range or wait for attendance data.</p>
                         </div>

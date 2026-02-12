@@ -39,13 +39,13 @@ export function LoginPage() {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-            <Card className="w-full max-w-md border-slate-200">
+        <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900 px-4">
+            <Card className="w-full max-w-md border-slate-200 dark:border-slate-700">
                 <CardHeader className="space-y-1 text-center">
-                    <CardTitle className="text-2xl font-semibold text-slate-900">
+                    <CardTitle className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
                         Admin Login
                     </CardTitle>
-                    <CardDescription className="text-slate-600">
+                    <CardDescription className="text-slate-600 dark:text-slate-400">
                         Enter your credentials to access the dashboard
                     </CardDescription>
                 </CardHeader>
