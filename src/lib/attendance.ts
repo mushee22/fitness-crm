@@ -65,6 +65,7 @@ export interface InactiveUser {
     name: string
     user_name: string
     phone: string
+    whatsapp_number: string | null
     email: string
     consecutive_missed_days: number
     last_attended_at: string | null
@@ -109,10 +110,11 @@ export const attendanceService = {
         return response.data
     },
 
-    async getInactiveUsers(days: number = 3): Promise<InactiveUsersResponse> {
-        const params = new URLSearchParams()
-        params.append('days', String(Math.min(365, Math.max(1, days))))
-        const response = await api.get(`attendances/inactive-users?${params.toString()}`)
+    async getInactiveUsers(days?: number): Promise<InactiveUsersResponse> {
+        const url = days != null
+            ? `attendances/inactive-users?days=${Math.min(365, Math.max(1, days))}`
+            : 'attendances/inactive-users'
+        const response = await api.get(url)
         return response.data
     }
 }

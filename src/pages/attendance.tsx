@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
-import { Calendar as CalendarIcon, Clock, User, Eye, UserX } from 'lucide-react'
+import { Calendar as CalendarIcon, Clock, User, Eye, UserX, MessageCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -324,13 +324,18 @@ export function AttendancePage() {
     )
 }
 
+function getWhatsAppUrl(phone: string): string {
+    const digits = (phone || '').replace(/\D/g, '')
+    return digits ? `https://wa.me/${digits}` : '#'
+}
+
 function InactiveUsersTab() {
-    const [days, setDays] = useState(7)
+    const [days, setDays] = useState<string>('')
     const navigate = useNavigate()
 
     const { data, isLoading } = useQuery({
         queryKey: ['attendances', 'inactive-users', days],
-        queryFn: () => attendanceService.getInactiveUsers(days),
+        queryFn: () => attendanceService.getInactiveUsers(days === '' ? undefined : Number(days)),
     })
 
     const DAY_OPTIONS = [3, 5, 7, 10]
@@ -351,11 +356,12 @@ function InactiveUsersTab() {
                         </div>
                         <div className="flex items-center gap-2 w-full sm:w-48">
                             <Label htmlFor="inactive-days" className="text-sm whitespace-nowrap">Min. missed days</Label>
-                            <Select value={String(days)} onValueChange={(v) => setDays(Number(v))}>
+                            <Select value={days === '' ? 'all' : days} onValueChange={(v) => setDays(v === 'all' ? '' : v)}>
                                 <SelectTrigger id="inactive-days">
-                                    <SelectValue />
+                                    <SelectValue placeholder="All" />
                                 </SelectTrigger>
                                 <SelectContent>
+                                    <SelectItem value="all">All</SelectItem>
                                     {DAY_OPTIONS.map((d) => (
                                         <SelectItem key={d} value={String(d)}>{d} days</SelectItem>
                                     ))}
@@ -414,14 +420,31 @@ function InactiveUsersTab() {
                                                     )}
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => navigate(`/users/${u.id}`)}
-                                                    >
-                                                        <Eye className="h-4 w-4 mr-1" />
-                                                        View
-                                                    </Button>
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            asChild
+                                                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                        >
+                                                            <a
+                                                                href={getWhatsAppUrl(u.whatsapp_number ?? u.phone)}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                            >
+                                                                <MessageCircle className="h-4 w-4 mr-1" />
+                                                                Send message
+                                                            </a>
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => navigate(`/users/${u.id}`)}
+                                                        >
+                                                            <Eye className="h-4 w-4 mr-1" />
+                                                            View
+                                                        </Button>
+                                                    </div>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -442,15 +465,32 @@ function InactiveUsersTab() {
                                             <p>Last attended: {u.last_attended_at ? formatDate(u.last_attended_at) : '—'}</p>
                                             <p>Reminders: {u.send_absence_reminders ? 'On' : 'Off'}</p>
                                         </div>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            className="w-full"
-                                            onClick={() => navigate(`/users/${u.id}`)}
-                                        >
-                                            <Eye className="h-4 w-4 mr-1" />
-                                            View user
-                                        </Button>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="flex-1 text-green-600 border-green-200 hover:bg-green-50"
+                                                asChild
+                                            >
+                                                <a
+                                                    href={getWhatsAppUrl(u.whatsapp_number ?? '')}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    <MessageCircle className="h-4 w-4 mr-1" />
+                                                    Send message
+                                                </a>
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="flex-1"
+                                                onClick={() => navigate(`/users/${u.id}`)}
+                                            >
+                                                <Eye className="h-4 w-4 mr-1" />
+                                                View user
+                                            </Button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -462,7 +502,7 @@ function InactiveUsersTab() {
                         <div className="p-12 text-center text-slate-500">
                             <UserX className="h-12 w-12 mx-auto mb-3 text-slate-300" />
                             <p className="font-medium">No inactive users</p>
-                            <p className="text-sm mt-1">No users have missed {data?.days ?? days}+ consecutive days.</p>
+                            <p className="text-sm mt-1">No users have missed {data?.days != null ? `${data.days}+` : days === '' ? 'the minimum' : `${days}+`} consecutive days.</p>
                         </div>
                     )}
                 </CardContent>
