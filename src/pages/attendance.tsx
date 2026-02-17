@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/select'
 import { attendanceService, type AttendanceFilters } from '@/lib/attendance'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatDate } from '@/lib/utils'
+import { formatDate, formatTimeKolkata, formatDateKolkata } from '@/lib/utils'
 
 export function AttendancePage() {
     const [page, setPage] = useState(1)
@@ -187,7 +187,7 @@ export function AttendancePage() {
                                             key={record.id}
                                         >
                                             <TableCell className="font-medium">
-                                                {format(new Date(record.created_at), 'MMM d, yyyy')}
+                                                {formatDateKolkata(record.created_at)}
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex flex-col">
@@ -199,7 +199,7 @@ export function AttendancePage() {
                                                 <div className="flex flex-col">
                                                     <span className="font-medium">{record.fitness_session?.title || `Session #${record.fitness_session_id}`}</span>
                                                     <span className="text-xs text-slate-500">
-                                                        {record.fitness_session?.start_time ? format(new Date(record.fitness_session.start_time), 'h:mm a') : 'N/A'}
+                                                        {record.fitness_session?.start_time ? formatTimeKolkata(record.fitness_session.start_time) : 'N/A'}
                                                     </span>
                                                 </div>
                                             </TableCell>
@@ -207,11 +207,11 @@ export function AttendancePage() {
                                                 <div className="text-sm">
                                                     <div className="flex items-center gap-1 text-green-600">
                                                         <span className="text-xs uppercase w-8">In</span>
-                                                        {record.joined_at ? format(new Date(record.joined_at), 'h:mm a') : '-'}
+                                                        {record.joined_at ? formatTimeKolkata(record.joined_at) : '-'}
                                                     </div>
                                                     <div className="flex items-center gap-1 text-slate-500">
                                                         <span className="text-xs uppercase w-8">Out</span>
-                                                        {record.left_at ? format(new Date(record.left_at), 'h:mm a') : '-'}
+                                                        {record.left_at ? formatTimeKolkata(record.left_at) : '-'}
                                                     </div>
                                                 </div>
                                             </TableCell>
@@ -265,7 +265,7 @@ export function AttendancePage() {
                                         <div className="flex items-center gap-2">
                                             <CalendarIcon className="h-4 w-4 text-slate-400" />
                                             <span className="font-medium text-slate-900">
-                                                {format(new Date(record.created_at), 'MMM d, yyyy')}
+                                                {formatDateKolkata(record.created_at)}
                                             </span>
                                         </div>
                                     </div>
@@ -290,11 +290,11 @@ export function AttendancePage() {
                                             <div className="grid grid-cols-2 gap-2 text-xs text-slate-500">
                                                 <div className="flex items-center gap-1 text-green-600">
                                                     <span className="font-medium uppercase">In:</span>
-                                                    {record.joined_at ? format(new Date(record.joined_at), 'h:mm a') : '-'}
+                                                    {record.joined_at ? formatTimeKolkata(record.joined_at) : '-'}
                                                 </div>
                                                 <div className="flex items-center gap-1 text-slate-500">
                                                     <span className="font-medium uppercase">Out:</span>
-                                                    {record.left_at ? format(new Date(record.left_at), 'h:mm a') : '-'}
+                                                    {record.left_at ? formatTimeKolkata(record.left_at) : '-'}
                                                 </div>
                                                 <div className="col-span-2 flex items-center gap-1">
                                                     <Clock className="h-3 w-3" />
