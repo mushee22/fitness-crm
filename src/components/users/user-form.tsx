@@ -113,14 +113,13 @@ export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps)
 
                     {/* Email */}
                     <div className="md:col-span-2 space-y-2">
-                        <Label htmlFor="email">Email Address *</Label>
+                        <Label htmlFor="email">Email Address</Label>
                         <Input
                             id="email"
                             type="email"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             placeholder="email@example.com"
-                            required
                         />
                     </div>
 
@@ -138,19 +137,18 @@ export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps)
 
                     {/* WhatsApp */}
                     <div className="space-y-2">
-                        <Label htmlFor="whatsapp">WhatsApp Number *</Label>
+                        <Label htmlFor="whatsapp">WhatsApp Number</Label>
                         <Input
                             id="whatsapp"
                             value={formData.whatsapp_number}
                             onChange={(e) => setFormData({ ...formData, whatsapp_number: e.target.value })}
                             placeholder="+1234567890"
-                            required
                         />
                     </div>
 
                     {/* Blood Group */}
                     <div className="space-y-2">
-                        <Label htmlFor="blood_group">Blood Group *</Label>
+                        <Label htmlFor="blood_group">Blood Group</Label>
                         <Select
                             value={formData.blood_group}
                             onValueChange={(value) => setFormData({ ...formData, blood_group: value })}
@@ -178,7 +176,7 @@ export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps)
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Height */}
                     <div className="space-y-2">
-                        <Label htmlFor="height">Height (cm) *</Label>
+                        <Label htmlFor="height">Height (cm)</Label>
                         <Input
                             id="height"
                             type="number"
@@ -186,13 +184,12 @@ export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps)
                             value={formData.height_cm || ''}
                             onChange={(e) => setFormData({ ...formData, height_cm: parseFloat(e.target.value) || 0 })}
                             placeholder="175"
-                            required
                         />
                     </div>
 
                     {/* Weight */}
                     <div className="space-y-2">
-                        <Label htmlFor="weight">Weight (kg) *</Label>
+                        <Label htmlFor="weight">Weight (kg)</Label>
                         <Input
                             id="weight"
                             type="number"
@@ -200,7 +197,6 @@ export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps)
                             value={formData.weight_kg || ''}
                             onChange={(e) => setFormData({ ...formData, weight_kg: parseFloat(e.target.value) || 0 })}
                             placeholder="70.5"
-                            required
                         />
                     </div>
                 </div>
@@ -214,7 +210,7 @@ export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps)
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Joined Date */}
                     <div className="space-y-2">
-                        <Label>Joined Date *</Label>
+                        <Label>Joined Date</Label>
                         <DatePicker
                             date={parseDate(formData.joined_at)}
                             onDateChange={(date) =>
@@ -226,7 +222,7 @@ export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps)
 
                     {/* End Date */}
                     <div className="space-y-2">
-                        <Label>Membership End Date *</Label>
+                        <Label>Membership End Date</Label>
                         <DatePicker
                             date={parseDate(formData.end_date)}
                             onDateChange={(date) =>
@@ -244,7 +240,7 @@ export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps)
                     Availability
                 </h3>
                 <div className="space-y-2">
-                    <Label>Available Days *</Label>
+                    <Label>Available Days</Label>
                     <div className="flex flex-wrap gap-2">
                         {DAYS_OF_WEEK.map((day) => (
                             <button
@@ -260,9 +256,6 @@ export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps)
                             </button>
                         ))}
                     </div>
-                    {formData.availability_days.length === 0 && (
-                        <p className="text-sm text-slate-500">Please select at least one day</p>
-                    )}
                 </div>
             </div>
 
@@ -293,7 +286,7 @@ export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps)
                 <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
                     Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading || formData.availability_days.length === 0}>
+                <Button type="submit" disabled={isLoading}>
                     {isLoading ? 'Saving...' : user ? 'Update User' : 'Create User'}
                 </Button>
             </div>

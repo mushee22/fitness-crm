@@ -41,6 +41,20 @@ export interface UsersListResponse {
     total: number
 }
 
+export interface ImportSkipReason {
+    row: number
+    reason: string
+    detail: string
+}
+
+export interface ImportUsersResponse {
+    message: string
+    total_rows_in_file?: number
+    created?: number
+    skipped?: number
+    skip_reasons?: ImportSkipReason[]
+}
+
 export const usersService = {
     async getUsers(page = 1, perPage = 15, search?: string): Promise<UsersListResponse> {
         let url = `users?page=${page}&per_page=${perPage}`
@@ -63,5 +77,16 @@ export const usersService = {
 
     async deleteUser(id: number): Promise<void> {
         await api.delete(`users/${id}`)
+    },
+
+    async importUsers(file: File): Promise<ImportUsersResponse> {
+        const formData = new FormData()
+        formData.append('file', file)
+        const response = await api.post('users/import-xlsx', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        })
+        return response.data
     },
 }

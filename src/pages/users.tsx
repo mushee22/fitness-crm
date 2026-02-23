@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { Eye, Edit, Trash2, Search, Plus, User as UserIcon } from 'lucide-react'
+import { Eye, Edit, Trash2, Search, Plus, User as UserIcon, Upload, Download } from 'lucide-react'
 import { toast } from 'sonner'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -24,7 +25,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
-import { usersService, type User } from '@/lib/users'
+import { usersService, type User, type ImportUsersResponse } from '@/lib/users'
 import { formatDate, getInitials } from '@/lib/utils'
 
 export function UsersPage() {
@@ -33,6 +34,9 @@ export function UsersPage() {
     const [searchQuery, setSearchQuery] = useState('')
     const [page, setPage] = useState(1)
     const [deletingUser, setDeletingUser] = useState<User | null>(null)
+    const [importFile, setImportFile] = useState<File | null>(null)
+    const [importResult, setImportResult] = useState<ImportUsersResponse | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     const { data, isLoading } = useQuery({
         queryKey: ['users', page],
@@ -48,6 +52,20 @@ export function UsersPage() {
         },
         onError: (error: any) => {
             toast.error(error.response?.data?.message || 'Failed to delete user')
+        },
+    })
+
+    const importMutation = useMutation({
+        mutationFn: usersService.importUsers,
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ['users'] })
+            setImportFile(null)
+            fileInputRef.current && (fileInputRef.current.value = '')
+            setImportResult(data)
+            toast.success(data?.message || 'Import completed')
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || 'Failed to import users')
         },
     })
 
@@ -70,6 +88,59 @@ export function UsersPage() {
                     Add User
                 </Button>
             </div>
+
+            {/* Import section */}
+            <Card className="border-slate-200 shadow-sm">
+                <CardHeader className="border-b border-slate-200 bg-slate-50/50">
+                    <CardTitle className="text-slate-900 flex items-center gap-2">
+                        <Upload className="h-5 w-5" />
+                        Import Users
+                    </CardTitle>
+                    <CardDescription>
+                        Upload a CSV or Excel file to bulk import members. Ensure columns match: name, email, phone, whatsapp_number, blood_group, etc.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-4 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+                        <div className="flex-1 space-y-2">
+                            <Label htmlFor="import-file">Choose file</Label>
+                            <Input
+                                ref={fileInputRef}
+                                id="import-file"
+                                type="file"
+                                accept=".csv,.xlsx,.xls"
+                                className="cursor-pointer file:cursor-pointer"
+                                onChange={(e) => setImportFile(e.target.files?.[0] ?? null)}
+                            />
+                            {importFile && (
+                                <p className="text-sm text-slate-600">
+                                    Selected: {importFile.name}
+                                </p>
+                            )}
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                            <Button
+                                variant="outline"
+                                asChild
+                                className="w-full sm:w-auto"
+                            >
+                                <a href="/users-import-sample.xlsx" download>
+                                    <Download className="h-4 w-4 mr-2" />
+                                    Download sample
+                                </a>
+                            </Button>
+                            <Button
+                                onClick={() => importFile && importMutation.mutate(importFile)}
+                                disabled={!importFile || importMutation.isPending}
+                                className="w-full sm:w-auto"
+                            >
+                                <Upload className="h-4 w-4 mr-2" />
+                                {importMutation.isPending ? 'Importing...' : 'Import'}
+                            </Button>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
 
             <Card className="border-slate-200 shadow-sm">
                 <CardHeader className="border-b border-slate-200 bg-slate-50/50">
@@ -316,6 +387,69 @@ export function UsersPage() {
                             className="w-full sm:w-auto"
                         >
                             {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Import Result Dialog */}
+            <Dialog open={!!importResult} onOpenChange={(open) => !open && setImportResult(null)}>
+                <DialogContent className="sm:max-w-lg max-h-[85vh] flex flex-col">
+                    <DialogHeader>
+                        <DialogTitle>Import result</DialogTitle>
+                        <DialogDescription>
+                            {importResult?.message}
+                        </DialogDescription>
+                    </DialogHeader>
+                    {importResult && (
+                        <div className="space-y-4 overflow-hidden flex flex-col min-h-0">
+                            {(importResult.total_rows_in_file != null || importResult.created != null || importResult.skipped != null) && (
+                                <div className="grid grid-cols-3 gap-3">
+                                    {importResult.total_rows_in_file != null && (
+                                        <div className="rounded-lg border border-slate-200 bg-slate-50/50 p-3 text-center">
+                                            <p className="text-2xl font-semibold text-slate-900">{importResult.total_rows_in_file}</p>
+                                            <p className="text-xs text-slate-600">Total rows</p>
+                                        </div>
+                                    )}
+                                    {importResult.created != null && (
+                                        <div className="rounded-lg border border-green-200 bg-green-50/50 p-3 text-center">
+                                            <p className="text-2xl font-semibold text-green-700">{importResult.created}</p>
+                                            <p className="text-xs text-slate-600">Created</p>
+                                        </div>
+                                    )}
+                                    {importResult.skipped != null && (
+                                        <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-3 text-center">
+                                            <p className="text-2xl font-semibold text-amber-700">{importResult.skipped}</p>
+                                            <p className="text-xs text-slate-600">Skipped</p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                            {importResult.skip_reasons && importResult.skip_reasons.length > 0 && (
+                                <div className="flex flex-col min-h-0">
+                                    <p className="text-sm font-medium text-slate-700 mb-2">Skip reasons</p>
+                                    <div className="border border-slate-200 rounded-lg overflow-auto max-h-48 space-y-1 p-2">
+                                        {importResult.skip_reasons.map((s, i) => (
+                                            <div
+                                                key={i}
+                                                className="text-sm py-2 px-2 rounded bg-slate-50 border-b border-slate-100 last:border-0"
+                                            >
+                                                <span className="font-medium text-slate-700">Row {s.row}</span>
+                                                <span className="text-slate-500 mx-1">·</span>
+                                                <span className="text-slate-600">{s.reason}</span>
+                                                {s.detail && (
+                                                    <p className="text-xs text-slate-500 mt-0.5 ml-0">{s.detail}</p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    <div className="flex justify-end pt-2">
+                        <Button variant="outline" onClick={() => setImportResult(null)}>
+                            Close
                         </Button>
                     </div>
                 </DialogContent>
