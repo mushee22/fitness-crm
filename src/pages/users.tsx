@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Eye, Edit, Trash2, Search, Plus, User as UserIcon, Upload, Download } from 'lucide-react'
 import { toast } from 'sonner'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -30,9 +30,21 @@ import { formatDate, getInitials } from '@/lib/utils'
 
 export function UsersPage() {
     const navigate = useNavigate()
+    const [searchParams, setSearchParams] = useSearchParams()
     const queryClient = useQueryClient()
     const [searchQuery, setSearchQuery] = useState('')
-    const [page, setPage] = useState(1)
+    const pageParam = searchParams.get('page')
+    const page = pageParam ? parseInt(pageParam, 10) : 1
+    const setPage = (newPage: number) => {
+        setSearchParams(prev => {
+            if (newPage === 1) {
+                prev.delete('page')
+            } else {
+                prev.set('page', newPage.toString())
+            }
+            return prev
+        })
+    }
     const [deletingUser, setDeletingUser] = useState<User | null>(null)
     const [importFile, setImportFile] = useState<File | null>(null)
     const [importResult, setImportResult] = useState<ImportUsersResponse | null>(null)
@@ -192,70 +204,70 @@ export function UsersPage() {
                                             </TableRow>
                                         ) : (
                                             filteredUsers?.map((user) => (
-                                                    <TableRow
-                                                        key={user.id}
-                                                        className="border-slate-200 hover:bg-slate-50/50 transition-colors"
-                                                    >
-                                                        <TableCell>
-                                                            <div className="flex items-center gap-3">
-                                                                <Avatar className="h-10 w-10 border-2 border-slate-200">
-                                                                    <AvatarFallback className="bg-primary/20 text-primary-foreground font-semibold">
-                                                                        {getInitials(user.name)}
-                                                                    </AvatarFallback>
-                                                                </Avatar>
-                                                                <div>
-                                                                    <p className="font-medium text-slate-900">{user.name}</p>
-                                                                    <p className="text-sm text-slate-500">{user.email}</p>
-                                                                </div>
+                                                <TableRow
+                                                    key={user.id}
+                                                    className="border-slate-200 hover:bg-slate-50/50 transition-colors"
+                                                >
+                                                    <TableCell>
+                                                        <div className="flex items-center gap-3">
+                                                            <Avatar className="h-10 w-10 border-2 border-slate-200">
+                                                                <AvatarFallback className="bg-primary/20 text-primary-foreground font-semibold">
+                                                                    {getInitials(user.name)}
+                                                                </AvatarFallback>
+                                                            </Avatar>
+                                                            <div>
+                                                                <p className="font-medium text-slate-900">{user.name}</p>
+                                                                <p className="text-sm text-slate-500">{user.email}</p>
                                                             </div>
-                                                        </TableCell>
-                                                        <TableCell className="text-slate-700">
-                                                            {user.user_name || '—'}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div className="space-y-1">
-                                                                <p className="text-sm text-slate-900">{user.phone}</p>
-                                                                <p className="text-xs text-slate-500">WhatsApp: {user.whatsapp_number}</p>
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Badge variant="outline" className="font-medium">
-                                                                {user.blood_group}
-                                                            </Badge>
-                                                        </TableCell>
-                                                        <TableCell className="text-slate-600">
-                                                            {formatDate(user.joined_at)}
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            <div className="flex justify-end gap-1">
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    className="h-9 w-9 hover:bg-primary/15 hover:text-primary transition-colors"
-                                                                    onClick={() => navigate(`/users/${user.id}`)}
-                                                                >
-                                                                    <Eye className="h-4 w-4" />
-                                                                </Button>
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    className="h-9 w-9 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-                                                                    onClick={() => navigate(`/users/${user.id}/edit`)}
-                                                                >
-                                                                    <Edit className="h-4 w-4" />
-                                                                </Button>
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    className="h-9 w-9 hover:bg-red-50 hover:text-red-600 transition-colors"
-                                                                    onClick={() => setDeletingUser(user)}
-                                                                >
-                                                                    <Trash2 className="h-4 w-4" />
-                                                                </Button>
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="text-slate-700">
+                                                        {user.user_name || '—'}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className="space-y-1">
+                                                            <p className="text-sm text-slate-900">{user.phone}</p>
+                                                            <p className="text-xs text-slate-500">WhatsApp: {user.whatsapp_number}</p>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="outline" className="font-medium">
+                                                            {user.blood_group}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="text-slate-600">
+                                                        {formatDate(user.joined_at)}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <div className="flex justify-end gap-1">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-9 w-9 hover:bg-primary/15 hover:text-primary transition-colors"
+                                                                onClick={() => navigate(`/users/${user.id}`)}
+                                                            >
+                                                                <Eye className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-9 w-9 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                                                                onClick={() => navigate(`/users/${user.id}/edit`)}
+                                                            >
+                                                                <Edit className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-9 w-9 hover:bg-red-50 hover:text-red-600 transition-colors"
+                                                                onClick={() => setDeletingUser(user)}
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
                                         )}
                                     </TableBody>
                                 </Table>
@@ -271,66 +283,66 @@ export function UsersPage() {
                                     </div>
                                 ) : (
                                     filteredUsers?.map((user) => (
-                                            <div key={user.id} className="p-4 hover:bg-slate-50/50 transition-colors">
-                                                <div className="flex items-start gap-3 mb-3">
-                                                    <Avatar className="h-12 w-12 border-2 border-slate-200">
-                                                        <AvatarFallback className="bg-primary/20 text-primary-foreground font-semibold">
-                                                            {getInitials(user.name)}
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                    <div className="flex-1 min-w-0">
-                                                        <h3 className="font-medium text-slate-900 truncate">{user.name}</h3>
-                                                        <p className="text-sm text-slate-500 truncate">{user.email}</p>
-                                                        {user.user_name && (
-                                                            <p className="text-xs text-slate-600 mt-0.5">@{user.user_name}</p>
-                                                        )}
-                                                        <div className="flex items-center gap-2 mt-1">
-                                                            <Badge variant="outline" className="text-xs">
-                                                                {user.blood_group}
-                                                            </Badge>
-                                                        </div>
+                                        <div key={user.id} className="p-4 hover:bg-slate-50/50 transition-colors">
+                                            <div className="flex items-start gap-3 mb-3">
+                                                <Avatar className="h-12 w-12 border-2 border-slate-200">
+                                                    <AvatarFallback className="bg-primary/20 text-primary-foreground font-semibold">
+                                                        {getInitials(user.name)}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="font-medium text-slate-900 truncate">{user.name}</h3>
+                                                    <p className="text-sm text-slate-500 truncate">{user.email}</p>
+                                                    {user.user_name && (
+                                                        <p className="text-xs text-slate-600 mt-0.5">@{user.user_name}</p>
+                                                    )}
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <Badge variant="outline" className="text-xs">
+                                                            {user.blood_group}
+                                                        </Badge>
                                                     </div>
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-2 text-sm mb-3">
-                                                    <div>
-                                                        <p className="text-slate-500 text-xs">Phone</p>
-                                                        <p className="text-slate-900">{user.phone}</p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-slate-500 text-xs">Joined</p>
-                                                        <p className="text-slate-900">{formatDate(user.joined_at)}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="flex-1"
-                                                        onClick={() => navigate(`/users/${user.id}`)}
-                                                    >
-                                                        <Eye className="h-4 w-4 mr-1" />
-                                                        View
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="flex-1"
-                                                        onClick={() => navigate(`/users/${user.id}/edit`)}
-                                                    >
-                                                        <Edit className="h-4 w-4 mr-1" />
-                                                        Edit
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => setDeletingUser(user)}
-                                                        className="text-red-600 hover:text-red-700"
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
                                                 </div>
                                             </div>
-                                        ))
+                                            <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+                                                <div>
+                                                    <p className="text-slate-500 text-xs">Phone</p>
+                                                    <p className="text-slate-900">{user.phone}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-slate-500 text-xs">Joined</p>
+                                                    <p className="text-slate-900">{formatDate(user.joined_at)}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="flex-1"
+                                                    onClick={() => navigate(`/users/${user.id}`)}
+                                                >
+                                                    <Eye className="h-4 w-4 mr-1" />
+                                                    View
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="flex-1"
+                                                    onClick={() => navigate(`/users/${user.id}/edit`)}
+                                                >
+                                                    <Edit className="h-4 w-4 mr-1" />
+                                                    Edit
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => setDeletingUser(user)}
+                                                    className="text-red-600 hover:text-red-700"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))
                                 )}
                             </div>
 

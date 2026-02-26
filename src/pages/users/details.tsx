@@ -53,9 +53,10 @@ export function UserDetailsPage() {
     const { id } = useParams<{ id: string }>()
     const navigate = useNavigate()
 
-    const { data: usersData, isLoading } = useQuery({
-        queryKey: ['users', 1],
-        queryFn: () => usersService.getUsers(1, 100),
+    const { data: userDetails, isLoading } = useQuery({
+        queryKey: ['users', id],
+        queryFn: () => usersService.getUser(id!),
+        enabled: !!id,
     })
 
     const { data: attendanceData, isLoading: loadingAttendance } = useQuery({
@@ -107,7 +108,9 @@ export function UserDetailsPage() {
         assignMutation.mutate(Number(selectedDietPlanId))
     }
 
-    const user = usersData?.data.find((u) => u.id === Number(id))
+    const user = userDetails?.data
+
+    console.log(userDetails, "user details")
 
     const getMembershipStatus = (endDate: string) => {
         const end = new Date(endDate)
@@ -163,7 +166,7 @@ export function UserDetailsPage() {
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => navigate('/users')}
+                        onClick={() => navigate(-1)}
                         className="hover:bg-slate-100 shrink-0"
                     >
                         <ArrowLeft className="h-5 w-5" />
@@ -655,7 +658,7 @@ export function UserDetailsPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {loadingAnalytics ? <Skeleton className="h-8 w-24" /> : userAnalytics?.absence_info.last_attended_at ? format(new Date(userAnalytics.absence_info.last_attended_at), 'MMM d') : '-'}
+                                    {loadingAnalytics ? <Skeleton className="h-8 w-24" /> : userAnalytics?.absence_info.last_attended_at ? format(new Date(userDetails.data.last_attended_at!), 'MMM d') : '-'}
                                 </div>
                             </CardContent>
                         </Card>

@@ -55,6 +55,26 @@ export interface ImportUsersResponse {
     skip_reasons?: ImportSkipReason[]
 }
 
+export interface UserDetailsResponse {
+    data: User & {
+        weight_history?: any[]
+        height_history?: any[]
+        activity_logs?: any[]
+        attendances?: any[]
+        diet_plans?: any[]
+        consecutive_missed_days?: number
+        last_attended_at?: string | null
+    }
+    attendance_stats: {
+        total_sessions_attended: number
+        fully_attended_sessions: number
+        early_exit_sessions: number
+        early_exit_percentage: number
+        average_attendance_duration: number
+        total_minutes_attended: number
+    }
+}
+
 export const usersService = {
     async getUsers(page = 1, perPage = 15, search?: string): Promise<UsersListResponse> {
         let url = `users?page=${page}&per_page=${perPage}`
@@ -62,6 +82,11 @@ export const usersService = {
             url += `&search=${encodeURIComponent(search)}`
         }
         const response = await api.get(url)
+        return response.data
+    },
+
+    async getUser(id: number | string): Promise<UserDetailsResponse> {
+        const response = await api.get(`users/${id}`)
         return response.data
     },
 
