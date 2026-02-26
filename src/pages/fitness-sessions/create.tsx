@@ -34,7 +34,7 @@ export function CreateSessionPage() {
                 <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => navigate('/fitness-sessions')}
+                    onClick={() => navigate(-1)}
                     className="hover:bg-slate-100 shrink-0"
                 >
                     <ArrowLeft className="h-5 w-5" />

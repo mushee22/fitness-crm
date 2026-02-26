@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Edit, Trash2, Search, Plus, Calendar as CalendarIcon, Clock, Users, Eye } from 'lucide-react'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
@@ -42,9 +42,23 @@ import { Calendar } from '@/components/ui/calendar'
 
 export function FitnessSessionsPage() {
     const navigate = useNavigate()
+    const [searchParams, setSearchParams] = useSearchParams()
     const queryClient = useQueryClient()
     const [searchQuery, setSearchQuery] = useState('')
-    const [page, setPage] = useState(1)
+    const [page, setPage] = useState(Number(searchParams.get('page')) || 1)
+
+    const updatePage = (newPage: number) => {
+        setPage(newPage)
+        setSearchParams(prev => {
+            const params = new URLSearchParams(prev)
+            if (newPage > 1) {
+                params.set('page', newPage.toString())
+            } else {
+                params.delete('page')
+            }
+            return params
+        })
+    }
     const [dateFrom, setDateFrom] = useState<Date>()
     const [dateTo, setDateTo] = useState<Date>()
     const [specificDate, setSpecificDate] = useState<Date>()
@@ -123,7 +137,7 @@ export function FitnessSessionsPage() {
                                         selected={specificDate}
                                         onSelect={(date) => {
                                             setSpecificDate(date)
-                                            setPage(1)
+                                            updatePage(1)
                                             // Clear range if specific date is selected to avoid conflict
                                             if (date) {
                                                 setDateFrom(undefined)
@@ -155,7 +169,7 @@ export function FitnessSessionsPage() {
                                         selected={dateFrom}
                                         onSelect={(date) => {
                                             setDateFrom(date)
-                                            setPage(1)
+                                            updatePage(1)
                                         }}
                                         initialFocus
                                     />
@@ -182,7 +196,7 @@ export function FitnessSessionsPage() {
                                         selected={dateTo}
                                         onSelect={(date) => {
                                             setDateTo(date)
-                                            setPage(1)
+                                            updatePage(1)
                                         }}
                                         initialFocus
                                     />
@@ -200,7 +214,7 @@ export function FitnessSessionsPage() {
                                     setDateFrom(undefined)
                                     setDateTo(undefined)
                                     setSpecificDate(undefined)
-                                    setPage(1)
+                                    updatePage(1)
                                 }}
                                 className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
                             >
@@ -399,7 +413,7 @@ export function FitnessSessionsPage() {
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            onClick={() => setPage(page - 1)}
+                                            onClick={() => updatePage(page - 1)}
                                             disabled={page === 1}
                                             className="flex-1 sm:flex-none"
                                         >
@@ -408,7 +422,7 @@ export function FitnessSessionsPage() {
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            onClick={() => setPage(page + 1)}
+                                            onClick={() => updatePage(page + 1)}
                                             disabled={page === data.last_page}
                                             className="flex-1 sm:flex-none"
                                         >

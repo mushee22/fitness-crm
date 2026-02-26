@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { format } from 'date-fns'
 import { Calendar as CalendarIcon, Clock, User, Eye, UserX, MessageCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -28,10 +28,24 @@ import { formatDate, formatTimeKolkata, formatDateKolkata } from '@/lib/utils'
 import { Search } from 'lucide-react'
 
 export function AttendancePage() {
-    const [page, setPage] = useState(1)
+    const [searchParams, setSearchParams] = useSearchParams()
+    const [page, setPage] = useState(Number(searchParams.get('page')) || 1)
     const [filters, setFilters] = useState<AttendanceFilters>({
         per_page: 20
     })
+
+    const updatePage = (newPage: number) => {
+        setPage(newPage)
+        setSearchParams(prev => {
+            const params = new URLSearchParams(prev)
+            if (newPage > 1) {
+                params.set('page', newPage.toString())
+            } else {
+                params.delete('page')
+            }
+            return params
+        })
+    }
     const [userSearch, setUserSearch] = useState('')
     const [sessionSearch, setSessionSearch] = useState('')
     const navigate = useNavigate()
@@ -53,12 +67,12 @@ export function AttendancePage() {
 
     const handleFilterChange = (key: keyof AttendanceFilters, value: any) => {
         setFilters(prev => ({ ...prev, [key]: value, page: 1 }))
-        setPage(1)
+        updatePage(1)
     }
 
     const clearFilters = () => {
         setFilters({ per_page: 20 })
-        setPage(1)
+        updatePage(1)
     }
 
     const getStatusBadge = (attendedFully: boolean, earlyExit: boolean) => {
@@ -375,6 +389,34 @@ export function AttendancePage() {
                                 )}
                             </div>
 
+                            {/* Pagination */}
+                            {data && data.last_page > 1 && (
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/30">
+                                    <p className="text-sm text-slate-600 text-center sm:text-left">
+                                        Page {data.current_page} of {data.last_page} ({data.total} total)
+                                    </p>
+                                    <div className="flex gap-2 justify-center sm:justify-end">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => updatePage(page - 1)}
+                                            disabled={page === 1}
+                                            className="flex-1 sm:flex-none"
+                                        >
+                                            Previous
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => updatePage(page + 1)}
+                                            disabled={page === data.last_page}
+                                            className="flex-1 sm:flex-none"
+                                        >
+                                            Next
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </TabsContent>
