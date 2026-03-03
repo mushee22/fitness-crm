@@ -14,12 +14,17 @@ export function formatCurrency(amount: number): string {
 
 const KOLKATA_TZ = 'Asia/Kolkata'
 
-/** Format an ISO date string as time (e.g. "6:07 PM") in Asia/Kolkata */
+/** Format an ISO date string as 12-hour time (e.g. "9:19 PM") in Asia/Kolkata. Handles strings like "2026-02-06T21:19:37+05:30". */
 export function formatTimeKolkata(iso: string | null | undefined): string {
     if (!iso) return '-'
     const d = new Date(iso)
     if (isNaN(d.getTime())) return '-'
-    return d.toLocaleString('en-IN', { timeZone: KOLKATA_TZ, hour: 'numeric', minute: '2-digit', hour12: true })
+    return d.toLocaleTimeString('en-US', {
+        timeZone: KOLKATA_TZ,
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+    })
 }
 
 /** Format an ISO date string as date (e.g. "Feb 17, 2026") in Asia/Kolkata */
