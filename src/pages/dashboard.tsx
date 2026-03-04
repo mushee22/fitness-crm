@@ -19,8 +19,8 @@ import {
 import { analyticsService } from '@/lib/analytics'
 
 export function DashboardPage() {
-    const [dateFrom, setDateFrom] = useState<Date>(() => new Date())
-    const [dateTo, setDateTo] = useState<Date>()
+    const [dateFrom, setDateFrom] = useState<Date | undefined>(() => new Date())
+    const [dateTo, setDateTo] = useState<Date | undefined>()
     const [usersModalType, setUsersModalType] = useState<'active' | 'inactive' | null>(null)
 
     const { data: dashboardData, isLoading } = useQuery({
