@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
-import { Calendar as CalendarIcon, Users, Clock, AlertTriangle } from 'lucide-react'
+import { Calendar as CalendarIcon, Users, Clock, AlertTriangle, UserCheck, UserX } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import { Button } from '@/components/ui/button'
@@ -10,11 +10,18 @@ import { KPICard } from '@/components/dashboard/kpi-card'
 import { ChartCard } from '@/components/dashboard/chart-card'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
 import { analyticsService } from '@/lib/analytics'
 
 export function DashboardPage() {
-    const [dateFrom, setDateFrom] = useState<Date>()
+    const [dateFrom, setDateFrom] = useState<Date>(() => new Date())
     const [dateTo, setDateTo] = useState<Date>()
+    const [usersModalType, setUsersModalType] = useState<'active' | 'inactive' | null>(null)
 
     const { data: dashboardData, isLoading } = useQuery({
         queryKey: ['dashboard-stats', dateFrom, dateTo],
@@ -47,8 +54,8 @@ export function DashboardPage() {
     if (isLoading) {
         return (
             <div className="space-y-6">
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    {[...Array(4)].map((_, i) => (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+                    {[...Array(6)].map((_, i) => (
                         <Skeleton key={i} className="h-32 bg-slate-200" />
                     ))}
                 </div>
@@ -119,37 +126,131 @@ export function DashboardPage() {
                 </div>
             </div>
 
-            {/* KPI Cards */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {/* KPI Cards - 5 in first row, 6th below */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
                 <KPICard
-                    title="Active Users"
-                    value={dashboardData?.users.active || 0}
-                    change={0} // No change data in API yet
+                    title="Total Users"
+                    value={dashboardData?.users.total || 0}
+                    change={0}
                     icon={Users}
                     index={0}
                 />
+                <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setUsersModalType('active')}
+                    onKeyDown={(e) => e.key === 'Enter' && setUsersModalType('active')}
+                    className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+                >
+                    <KPICard
+                        title="Active Users"
+                        value={dashboardData?.users.active || 0}
+                        change={0}
+                        icon={UserCheck}
+                        index={1}
+                    />
+                </div>
+                <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setUsersModalType('inactive')}
+                    onKeyDown={(e) => e.key === 'Enter' && setUsersModalType('inactive')}
+                    className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg"
+                >
+                    <KPICard
+                        title="Inactive Users"
+                        value={dashboardData?.users.inactive || 0}
+                        change={0}
+                        icon={UserX}
+                        index={2}
+                    />
+                </div>
                 <KPICard
                     title="Attendance Rate"
                     value={`${dashboardData?.sessions.attendance_rate || 0}%`}
                     change={0}
                     icon={CalendarIcon}
-                    index={1}
+                    index={3}
                 />
                 <KPICard
                     title="Total Attendances"
                     value={dashboardData?.attendance.total_attendances || 0}
                     change={0}
-                    icon={Users}
-                    index={2}
+                    icon={CalendarIcon}
+                    index={4}
                 />
                 <KPICard
                     title="Avg Duration"
                     value={`${dashboardData?.attendance.average_duration_minutes || 0}m`}
                     change={0}
                     icon={Clock}
-                    index={3}
+                    index={5}
                 />
             </div>
+
+            {/* Active / Inactive Users modal */}
+            <Dialog open={usersModalType !== null} onOpenChange={(open) => !open && setUsersModalType(null)}>
+                <DialogContent className="max-w-md max-h-[80vh] flex flex-col">
+                    <DialogHeader>
+                        <DialogTitle className="text-slate-900 dark:text-slate-100">
+                            {usersModalType === 'active' ? 'Active Users' : 'Inactive Users'}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="overflow-y-auto flex-1 min-h-0 -mx-1 px-1">
+                        {usersModalType === 'active' && (
+                            (dashboardData?.users.active_users?.length ?? 0) === 0 ? (
+                                <p className="text-sm text-slate-500 dark:text-slate-400 py-4">No active users.</p>
+                            ) : (
+                                <ul className="space-y-1">
+                                    {(dashboardData?.users.active_users ?? []).map((user) => (
+                                        <li key={user.id}>
+                                            <Link
+                                                to={`/users/${user.id}`}
+                                                className="flex items-center justify-between gap-2 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                                                onClick={() => setUsersModalType(null)}
+                                            >
+                                                <div>
+                                                    <span className="font-medium text-slate-900 dark:text-slate-100">{user.name}</span>
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                        Last attended: {user.last_attended_at ? format(new Date(user.last_attended_at), 'MMM d, yyyy') : 'Never'}
+                                                    </p>
+                                                </div>
+                                                <span className="text-xs text-slate-400 dark:text-slate-500">{user.phone}</span>
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )
+                        )}
+                        {usersModalType === 'inactive' && (
+                            (dashboardData?.users.inactive_users?.length ?? 0) === 0 ? (
+                                <p className="text-sm text-slate-500 dark:text-slate-400 py-4">No inactive users.</p>
+                            ) : (
+                                <ul className="space-y-1">
+                                    {(dashboardData?.users.inactive_users ?? []).map((user) => (
+                                        <li key={user.id}>
+                                            <Link
+                                                to={`/users/${user.id}`}
+                                                className="flex items-center justify-between gap-2 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                                                onClick={() => setUsersModalType(null)}
+                                            >
+                                                <div>
+                                                    <span className="font-medium text-slate-900 dark:text-slate-100">{user.name}</span>
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                        Last attended: {user.last_attended_at ? format(new Date(user.last_attended_at), 'MMM d, yyyy') : 'Never'}
+                                                        {user.consecutive_missed_days > 0 && ` · ${user.consecutive_missed_days} days missed`}
+                                                    </p>
+                                                </div>
+                                                <span className="text-xs text-slate-400 dark:text-slate-500">{user.phone}</span>
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
 
             {/* Dropout Risk & Charts */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">

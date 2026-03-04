@@ -20,6 +20,20 @@ export interface DashboardData {
         total: number
         active: number
         inactive: number
+        active_users?: Array<{
+            id: number
+            name: string
+            phone: string
+            last_attended_at: string | null
+            consecutive_missed_days: number
+        }>
+        inactive_users?: Array<{
+            id: number
+            name: string
+            phone: string
+            last_attended_at: string | null
+            consecutive_missed_days: number
+        }>
     }
     sessions: {
         total: number
