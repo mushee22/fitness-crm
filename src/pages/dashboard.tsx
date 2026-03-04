@@ -85,6 +85,7 @@ export function DashboardPage() {
                         <PopoverContent className="w-auto p-0" align="end">
                             <Calendar
                                 mode="single"
+                                required={false}
                                 selected={dateFrom}
                                 onSelect={setDateFrom}
                                 initialFocus
@@ -104,6 +105,7 @@ export function DashboardPage() {
                         <PopoverContent className="w-auto p-0" align="end">
                             <Calendar
                                 mode="single"
+                                required={false}
                                 selected={dateTo}
                                 onSelect={setDateTo}
                                 initialFocus
