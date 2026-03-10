@@ -82,10 +82,13 @@ export function UsersPage() {
     })
 
     const filteredUsers = data?.data?.filter(
-        (user) =>
-            user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (user.user_name && user.user_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-            user.email.toLowerCase().includes(searchQuery.toLowerCase())
+        (user) => {
+            const q = searchQuery.toLowerCase()
+            const name = (user.name ?? '').toLowerCase()
+            const userName = (user.user_name ?? '').toLowerCase()
+            const email = (user.email ?? '').toLowerCase()
+            return name.includes(q) || userName.includes(q) || email.includes(q)
+        }
     )
 
     return (
