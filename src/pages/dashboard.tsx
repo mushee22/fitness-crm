@@ -130,13 +130,18 @@ export function DashboardPage() {
 
             {/* KPI Cards - 5 in first row, 6th below */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-                <KPICard
-                    title="Total Users"
-                    value={dashboardData?.users.total || 0}
-                    change={0}
-                    icon={Users}
-                    index={0}
-                />
+                <Link
+                    to="/users"
+                    className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg block"
+                >
+                    <KPICard
+                        title="Total Users"
+                        value={dashboardData?.users.total || 0}
+                        change={0}
+                        icon={Users}
+                        index={0}
+                    />
+                </Link>
                 <div
                     role="button"
                     tabIndex={0}
