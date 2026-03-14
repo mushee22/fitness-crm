@@ -468,69 +468,6 @@ export function SessionDetailsPage() {
                             )}
                         </CardContent>
                     </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center justify-between">
-                                <CardTitle>Invited Users</CardTitle>
-                                <Badge variant="outline">{session.join_tokens?.length || 0} Users</Badge>
-                            </div>
-                            <CardDescription>
-                                Users invited to this session
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {session.join_tokens && session.join_tokens.length > 0 ? (
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>User</TableHead>
-                                            <TableHead>Email</TableHead>
-                                            <TableHead>Availability</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {session.join_tokens.map((token) => (
-                                            <TableRow key={token.id}>
-                                                <TableCell>
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-medium text-slate-600">
-                                                            {token.user.name.substring(0, 2).toUpperCase()}
-                                                        </div>
-                                                        <Link to={`/users/${token.user.id}`} className="font-medium text-slate-900 hover:underline">
-                                                            {token.user.name}
-                                                        </Link>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="text-slate-500">
-                                                    {token.user.email}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {token.user.availability_days?.slice(0, 3).map((day) => (
-                                                            <Badge key={day} variant="outline" className="text-[10px] px-1.5 py-0 capitalize">
-                                                                {day.substring(0, 3)}
-                                                            </Badge>
-                                                        ))}
-                                                        {token.user.availability_days?.length > 3 && (
-                                                            <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                                                                +{token.user.availability_days.length - 3}
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            ) : (
-                                <div className="text-center py-8 text-slate-500">
-                                    <Users className="h-8 w-8 mx-auto mb-2 text-slate-300" />
-                                    <p>No invited users</p>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
                 </TabsContent>
             </Tabs>
         </div>
