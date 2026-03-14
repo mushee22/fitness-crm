@@ -21,6 +21,8 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { attendanceService, type AttendanceFilters } from '@/lib/attendance'
+
+const PAGE_SIZE_OPTIONS = [10, 15, 25, 50, 100]
 import { usersService } from '@/lib/users'
 import { fitnessSessionsService } from '@/lib/fitness-sessions'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -31,7 +33,7 @@ export function AttendancePage() {
     const [searchParams, setSearchParams] = useSearchParams()
     const [page, setPage] = useState(Number(searchParams.get('page')) || 1)
     const [filters, setFilters] = useState<AttendanceFilters>({
-        per_page: 20
+        per_page: 10
     })
 
     const updatePage = (newPage: number) => {
@@ -71,7 +73,7 @@ export function AttendancePage() {
     }
 
     const clearFilters = () => {
-        setFilters({ per_page: 20 })
+        setFilters({ per_page: 10 })
         updatePage(1)
     }
 
@@ -232,6 +234,22 @@ export function AttendancePage() {
 
                     <Card>
                         <CardContent className="p-0">
+                            <div className="flex flex-wrap items-center gap-2 px-4 sm:px-6 pt-4 pb-3 border-b border-slate-200">
+                                <span className="text-sm text-slate-600">Rows per page</span>
+                                <Select
+                                    value={String(filters.per_page ?? 10)}
+                                    onValueChange={(v) => handleFilterChange('per_page', Number(v))}
+                                >
+                                    <SelectTrigger className="w-[70px] h-8 text-sm">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {PAGE_SIZE_OPTIONS.map((n) => (
+                                            <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                             <div className="hidden md:block">
                                 <Table>
                                     <TableHeader>
@@ -390,7 +408,7 @@ export function AttendancePage() {
                             </div>
 
                             {/* Pagination */}
-                            {data && data.last_page > 1 && (
+                            {data && (
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/30">
                                     <p className="text-sm text-slate-600 text-center sm:text-left">
                                         Page {data.current_page} of {data.last_page} ({data.total} total)

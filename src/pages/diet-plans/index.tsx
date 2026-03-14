@@ -33,18 +33,21 @@ import { Label } from '@/components/ui/label'
 import { dietPlansService, type DietPlan } from '@/lib/diet-plans'
 import { usersService } from '@/lib/users'
 
+const PAGE_SIZE_OPTIONS = [10, 15, 25, 50, 100]
+
 export function DietPlansPage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const [page, setPage] = useState(1)
+    const [perPage, setPerPage] = useState(10)
     const [deletingPlan, setDeletingPlan] = useState<DietPlan | null>(null)
     const [assigningPlan, setAssigningPlan] = useState<DietPlan | null>(null)
     const [selectedUserId, setSelectedUserId] = useState<string>('')
     const [userSearch, setUserSearch] = useState('')
 
     const { data, isLoading } = useQuery({
-        queryKey: ['diet-plans', page],
-        queryFn: () => dietPlansService.getDietPlans(page),
+        queryKey: ['diet-plans', page, perPage],
+        queryFn: () => dietPlansService.getDietPlans(page, perPage),
     })
 
     const { data: usersData, isLoading: isLoadingUsers } = useQuery({
@@ -109,6 +112,25 @@ export function DietPlansPage() {
                         </div>
                     ) : (
                         <>
+                            <div className="flex flex-wrap items-center gap-2 px-4 sm:px-6 pt-2 pb-3 border-b border-slate-200">
+                                <span className="text-sm text-slate-600">Rows per page</span>
+                                <Select
+                                    value={String(perPage)}
+                                    onValueChange={(v) => {
+                                        setPerPage(Number(v))
+                                        setPage(1)
+                                    }}
+                                >
+                                    <SelectTrigger className="w-[70px] h-8 text-sm">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {PAGE_SIZE_OPTIONS.map((n) => (
+                                            <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                             <div className="hidden md:block overflow-x-auto">
                                 <Table>
                                     <TableHeader>
@@ -273,7 +295,7 @@ export function DietPlansPage() {
                             </div>
 
                             {/* Pagination */}
-                            {data && data.last_page > 1 && (
+                            {data && (
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/30">
                                     <p className="text-sm text-slate-600 text-center sm:text-left">
                                         Page {data.current_page} of {data.last_page} ({data.total} total)

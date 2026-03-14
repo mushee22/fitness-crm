@@ -26,6 +26,15 @@ import {
 } from '@/components/ui/dialog'
 import { fitnessSessionsService, type FitnessSession, type SessionStatus } from '@/lib/fitness-sessions'
 import { formatDate } from '@/lib/utils'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+
+const PAGE_SIZE_OPTIONS = [10, 15, 25, 50, 100]
 
 function getSessionStatusBadge(status?: SessionStatus) {
     if (!status) return null
@@ -62,12 +71,14 @@ export function FitnessSessionsPage() {
     const [dateFrom, setDateFrom] = useState<Date>()
     const [dateTo, setDateTo] = useState<Date>()
     const [specificDate, setSpecificDate] = useState<Date>()
+    const [perPage, setPerPage] = useState(10)
     const [deletingSession, setDeletingSession] = useState<FitnessSession | null>(null)
 
     const { data, isLoading } = useQuery({
-        queryKey: ['fitness-sessions', page, dateFrom, dateTo, specificDate],
+        queryKey: ['fitness-sessions', page, perPage, dateFrom, dateTo, specificDate],
         queryFn: () => fitnessSessionsService.getSessions({
             page,
+            per_page: perPage,
             date_from: dateFrom ? format(dateFrom, 'yyyy-MM-dd') : undefined,
             date_to: dateTo ? format(dateTo, 'yyyy-MM-dd') : undefined,
             date: specificDate ? format(specificDate, 'yyyy-MM-dd') : undefined,
@@ -232,6 +243,25 @@ export function FitnessSessionsPage() {
                         </div>
                     ) : (
                         <>
+                            <div className="flex flex-wrap items-center gap-2 px-4 sm:px-6 pt-2 pb-3 border-b border-slate-200 dark:border-slate-700">
+                                <span className="text-sm text-slate-600 dark:text-slate-400">Rows per page</span>
+                                <Select
+                                    value={String(perPage)}
+                                    onValueChange={(v) => {
+                                        setPerPage(Number(v))
+                                        updatePage(1)
+                                    }}
+                                >
+                                    <SelectTrigger className="w-[70px] h-8 text-sm">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {PAGE_SIZE_OPTIONS.map((n) => (
+                                            <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                             {/* Desktop Table View */}
                             <div className="hidden md:block overflow-x-auto">
                                 <Table>
@@ -404,7 +434,7 @@ export function FitnessSessionsPage() {
                             </div>
 
                             {/* Pagination */}
-                            {data && data.last_page > 1 && (
+                            {data && (
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 sm:px-6 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/30">
                                     <p className="text-sm text-slate-600 dark:text-slate-400 text-center sm:text-left">
                                         Page {data.current_page} of {data.last_page} ({data.total} total)

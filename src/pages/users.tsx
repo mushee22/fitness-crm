@@ -25,7 +25,16 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 import { usersService, type User, type ImportUsersResponse } from '@/lib/users'
+
+const PAGE_SIZE_OPTIONS = [10, 15, 25, 50, 100]
 import { formatDate, getInitials } from '@/lib/utils'
 
 export function UsersPage() {
@@ -35,6 +44,8 @@ export function UsersPage() {
     const [searchQuery, setSearchQuery] = useState('')
     const pageParam = searchParams.get('page')
     const page = pageParam ? parseInt(pageParam, 10) : 1
+    const perPageParam = searchParams.get('per_page')
+    const perPage = perPageParam ? parseInt(perPageParam, 10) : 10
     const setPage = (newPage: number) => {
         setSearchParams(prev => {
             if (newPage === 1) {
@@ -45,14 +56,21 @@ export function UsersPage() {
             return prev
         })
     }
+    const setPerPage = (value: number) => {
+        setSearchParams(prev => {
+            prev.set('per_page', value.toString())
+            prev.delete('page')
+            return prev
+        })
+    }
     const [deletingUser, setDeletingUser] = useState<User | null>(null)
     const [importFile, setImportFile] = useState<File | null>(null)
     const [importResult, setImportResult] = useState<ImportUsersResponse | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const { data, isLoading } = useQuery({
-        queryKey: ['users', page],
-        queryFn: () => usersService.getUsers(page),
+        queryKey: ['users', page, perPage],
+        queryFn: () => usersService.getUsers(page, perPage),
     })
 
     const deleteMutation = useMutation({
@@ -181,6 +199,23 @@ export function UsersPage() {
                         </div>
                     ) : (
                         <>
+                            {/* Rows per page - top of table */}
+                            <div className="flex flex-wrap items-center gap-2 px-4 sm:px-6 pt-2 pb-3 border-b border-slate-200">
+                                <span className="text-sm text-slate-600">Rows per page</span>
+                                <Select
+                                    value={String(perPage)}
+                                    onValueChange={(v) => setPerPage(Number(v))}
+                                >
+                                    <SelectTrigger className="w-[70px] h-8 text-sm">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {PAGE_SIZE_OPTIONS.map((n) => (
+                                            <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                             {/* Desktop Table View */}
                             <div className="hidden md:block overflow-x-auto">
                                 <Table>
@@ -350,7 +385,7 @@ export function UsersPage() {
                             </div>
 
                             {/* Pagination */}
-                            {data && data.last_page > 1 && (
+                            {data && (
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/30">
                                     <p className="text-sm text-slate-600 text-center sm:text-left">
                                         Page {data.current_page} of {data.last_page} ({data.total} total)
