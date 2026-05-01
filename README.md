@@ -72,3 +72,33 @@ export default defineConfig([
 ])
 ```
 # fitness-crm
+
+## Automated Sessions Flow
+
+The admin panel includes an `Automated Sessions` section for managing recurring daily session rules.
+
+### UI flow
+
+- Open `Automated Sessions` from sidebar.
+- Use `Create Rule` to add a recurring rule.
+- Use row actions to `Edit`, `Pause`, `Resume`, or `Cancel` a rule.
+- Filter list by `All`, `Active`, or `Paused`.
+- Pagination is server-driven (`page`, `per_page`).
+
+### API mapping
+
+- `GET /api/automated-sessions?is_active=1&per_page=15` -> list rules (`automatedSessionsService.getRules`)
+- `POST /api/automated-sessions` -> create rule (`automatedSessionsService.createRule`)
+- `GET /api/automated-sessions/{id}` -> fetch one rule (`automatedSessionsService.getRule`)
+- `PATCH /api/automated-sessions/{id}` -> update rule (`automatedSessionsService.updateRule`)
+- `POST /api/automated-sessions/{id}/pause` -> pause rule (`automatedSessionsService.pauseRule`)
+- `POST /api/automated-sessions/{id}/resume` -> resume rule (`automatedSessionsService.resumeRule`)
+- `DELETE /api/automated-sessions/{id}` -> cancel rule (`automatedSessionsService.cancelRule`)
+
+### Validation and error handling
+
+- Client-side checks:
+  - `end_time` must be after `start_time`
+  - `ends_on` must be the same day or after `starts_on`
+- API `422` validation errors are shown inline in the rule form.
+- All mutations show loading states and success/error toast feedback.

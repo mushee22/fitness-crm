@@ -23,6 +23,7 @@ import { DietPlansPage } from './pages/diet-plans'
 import { CreateDietPlanPage } from './pages/diet-plans/create'
 import { EditDietPlanPage } from './pages/diet-plans/edit'
 import { DietPlanDetailPage } from './pages/diet-plans/detail'
+import { AutomatedSessionsPage } from './pages/automated-sessions'
 import { BulkMessagePage } from './pages/bulk-message'
 
 
@@ -74,6 +75,7 @@ function App() {
                 <Route path=":id" element={<DietPlanDetailPage />} />
                 <Route path=":id/edit" element={<EditDietPlanPage />} />
               </Route>
+              <Route path="automated-sessions" element={<AutomatedSessionsPage />} />
 
               <Route path="bulk-message" element={<BulkMessagePage />} />
 

@@ -43,6 +43,41 @@ export function formatDate(date: string | Date): string {
     }).format(new Date(date))
 }
 
+function parseTimeToMinutes(time: string): number | null {
+    const normalized = time.trim()
+    if (!normalized) return null
+    const parts = normalized.split(':')
+    if (parts.length < 2) return null
+
+    const hours = Number(parts[0])
+    const minutes = Number(parts[1])
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) return null
+    return (hours * 60) + minutes
+}
+
+function minutesToHHmm(totalMinutes: number): string {
+    const normalized = ((totalMinutes % 1440) + 1440) % 1440
+    const hours = Math.floor(normalized / 60)
+    const minutes = normalized % 60
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+}
+
+// Converts a UTC time string (HH:mm or HH:mm:ss) to IST (HH:mm)
+export function utcTimeToIstHHmm(time: string | null | undefined): string {
+    if (!time) return ''
+    const minutes = parseTimeToMinutes(time)
+    if (minutes == null) return ''
+    return minutesToHHmm(minutes + 330)
+}
+
+// Converts an IST time string (HH:mm or HH:mm:ss) to UTC (HH:mm)
+export function istTimeToUtcHHmm(time: string | null | undefined): string {
+    if (!time) return ''
+    const minutes = parseTimeToMinutes(time)
+    if (minutes == null) return ''
+    return minutesToHHmm(minutes - 330)
+}
+
 export function formatNumber(num: number): string {
     return new Intl.NumberFormat('en-US').format(num)
 }
