@@ -46,6 +46,24 @@ export function formatDate(date: string | Date): string {
 function parseTimeToMinutes(time: string): number | null {
     const normalized = time.trim()
     if (!normalized) return null
+
+    // Handle ISO datetime strings like "2026-05-01T00:30:00.000000Z"
+    if (normalized.includes('T')) {
+        const parsedDate = new Date(normalized)
+        if (!isNaN(parsedDate.getTime())) {
+            const hhmm = parsedDate.toLocaleTimeString('en-GB', {
+                timeZone: 'UTC',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+            })
+            const [h, m] = hhmm.split(':').map(Number)
+            if (!Number.isNaN(h) && !Number.isNaN(m)) {
+                return (h * 60) + m
+            }
+        }
+    }
+
     const parts = normalized.split(':')
     if (parts.length < 2) return null
 

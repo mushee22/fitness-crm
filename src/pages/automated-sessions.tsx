@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Plus, Bot } from 'lucide-react'
+import { Plus, Bot, Copy, ExternalLink } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -192,6 +192,15 @@ export function AutomatedSessionsPage() {
         setFormApiErrors({})
     }
 
+    const handleCopyJoinUrl = async (url: string) => {
+        try {
+            await navigator.clipboard.writeText(url)
+            toast.success('Zoom join link copied')
+        } catch {
+            toast.error('Failed to copy link')
+        }
+    }
+
     return (
         <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -274,12 +283,16 @@ export function AutomatedSessionsPage() {
                                             <TableHead>Ends On</TableHead>
                                             <TableHead>Status</TableHead>
                                             <TableHead>Last Generated</TableHead>
+                                            <TableHead>Latest Zoom Link</TableHead>
                                             <TableHead className="text-right">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {data?.data?.length ? (
                                             data.data.map((rule) => (
+                                                (() => {
+                                                    const latestJoinUrl = rule.latest_generated_session?.zoom_join_url
+                                                    return (
                                                 <TableRow key={rule.id}>
                                                     <TableCell className="font-medium text-slate-900">{rule.title}</TableCell>
                                                     <TableCell>{utcTimeToIstHHmm(rule.start_time)} - {utcTimeToIstHHmm(rule.end_time)}</TableCell>
@@ -291,6 +304,33 @@ export function AutomatedSessionsPage() {
                                                         </Badge>
                                                     </TableCell>
                                                     <TableCell>{rule.last_generated_for_date ? formatDate(rule.last_generated_for_date) : '—'}</TableCell>
+                                                    <TableCell>
+                                                        {latestJoinUrl ? (
+                                                            <div className="flex items-center gap-2">
+                                                                <a
+                                                                    href={latestJoinUrl}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="text-primary hover:underline inline-flex items-center gap-1 text-sm"
+                                                                >
+                                                                    Open
+                                                                    <ExternalLink className="h-3.5 w-3.5" />
+                                                                </a>
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    className="h-8 px-2"
+                                                                    onClick={() => handleCopyJoinUrl(latestJoinUrl)}
+                                                                >
+                                                                    <Copy className="h-3.5 w-3.5 mr-1" />
+                                                                    Copy
+                                                                </Button>
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-slate-400">—</span>
+                                                        )}
+                                                    </TableCell>
                                                     <TableCell className="text-right">
                                                         <RuleActions
                                                             rule={rule}
@@ -302,10 +342,12 @@ export function AutomatedSessionsPage() {
                                                         />
                                                     </TableCell>
                                                 </TableRow>
+                                                    )
+                                                })()
                                             ))
                                         ) : (
                                             <TableRow>
-                                                <TableCell colSpan={7} className="h-36 text-center text-slate-500">
+                                                <TableCell colSpan={8} className="h-36 text-center text-slate-500">
                                                     <div className="flex flex-col items-center justify-center gap-2">
                                                         <Bot className="h-10 w-10 text-slate-300" />
                                                         <p className="font-medium">No rules found</p>
@@ -321,6 +363,9 @@ export function AutomatedSessionsPage() {
                             <div className="md:hidden divide-y divide-slate-200">
                                 {data?.data?.length ? (
                                     data.data.map((rule) => (
+                                        (() => {
+                                            const latestJoinUrl = rule.latest_generated_session?.zoom_join_url
+                                            return (
                                         <div key={rule.id} className="p-4 space-y-3">
                                             <div className="flex items-start justify-between gap-3">
                                                 <div>
@@ -338,6 +383,29 @@ export function AutomatedSessionsPage() {
                                                 <p>Ends: {rule.ends_on ? formatDate(rule.ends_on) : 'No end'}</p>
                                                 <p>Generated: {rule.last_generated_for_date ? formatDate(rule.last_generated_for_date) : '—'}</p>
                                             </div>
+                                            {latestJoinUrl && (
+                                                <div className="flex items-center gap-2">
+                                                    <a
+                                                        href={latestJoinUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-primary hover:underline inline-flex items-center gap-1 text-sm"
+                                                    >
+                                                        Open latest Zoom link
+                                                        <ExternalLink className="h-3.5 w-3.5" />
+                                                    </a>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 px-2"
+                                                        onClick={() => handleCopyJoinUrl(latestJoinUrl)}
+                                                    >
+                                                        <Copy className="h-3.5 w-3.5 mr-1" />
+                                                        Copy
+                                                    </Button>
+                                                </div>
+                                            )}
                                             <div className="flex justify-end">
                                                 <RuleActions
                                                     rule={rule}
@@ -349,6 +417,8 @@ export function AutomatedSessionsPage() {
                                                 />
                                             </div>
                                         </div>
+                                            )
+                                        })()
                                     ))
                                 ) : (
                                     <div className="p-8 text-center text-slate-500">

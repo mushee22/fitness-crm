@@ -13,6 +13,9 @@ export interface AutomatedSessionRule {
     created_by: number | null
     created_at: string
     updated_at: string
+    latest_generated_session?: {
+        zoom_join_url?: string | null
+    } | null
 }
 
 export interface AutomatedSessionRulesListResponse {
