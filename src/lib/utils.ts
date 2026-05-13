@@ -43,57 +43,41 @@ export function formatDate(date: string | Date): string {
     }).format(new Date(date))
 }
 
-function parseTimeToMinutes(time: string): number | null {
-    const normalized = time.trim()
-    if (!normalized) return null
-
-    // Handle ISO datetime strings like "2026-05-01T00:30:00.000000Z"
-    if (normalized.includes('T')) {
-        const parsedDate = new Date(normalized)
-        if (!isNaN(parsedDate.getTime())) {
-            const hhmm = parsedDate.toLocaleTimeString('en-GB', {
-                timeZone: 'UTC',
+/**
+ * Converts an automated session rule time from the API to HH:mm for native time inputs.
+ * ISO strings use the wall clock in Asia/Kolkata. Plain H:mm / HH:mm:ss values are treated as
+ * already IST wall clock (typical Laravel time cast), without adding a second UTC→IST offset.
+ */
+export function automatedRuleTimeToInputHHmm(value: string | null | undefined): string {
+    if (!value) return ''
+    const trimmed = value.trim()
+    if (trimmed.includes('T')) {
+        const d = new Date(trimmed)
+        if (!Number.isNaN(d.getTime())) {
+            const token = d.toLocaleTimeString('en-GB', {
+                timeZone: KOLKATA_TZ,
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false,
             })
-            const [h, m] = hhmm.split(':').map(Number)
+            const [hStr, mStr] = token.split(':')
+            const h = Number(hStr)
+            const m = Number(mStr)
             if (!Number.isNaN(h) && !Number.isNaN(m)) {
-                return (h * 60) + m
+                return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
             }
         }
+        return ''
     }
-
-    const parts = normalized.split(':')
-    if (parts.length < 2) return null
-
-    const hours = Number(parts[0])
-    const minutes = Number(parts[1])
-    if (Number.isNaN(hours) || Number.isNaN(minutes)) return null
-    return (hours * 60) + minutes
-}
-
-function minutesToHHmm(totalMinutes: number): string {
-    const normalized = ((totalMinutes % 1440) + 1440) % 1440
-    const hours = Math.floor(normalized / 60)
-    const minutes = normalized % 60
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
-}
-
-// Converts a UTC time string (HH:mm or HH:mm:ss) to IST (HH:mm)
-export function utcTimeToIstHHmm(time: string | null | undefined): string {
-    if (!time) return ''
-    const minutes = parseTimeToMinutes(time)
-    if (minutes == null) return ''
-    return minutesToHHmm(minutes + 330)
-}
-
-// Converts an IST time string (HH:mm or HH:mm:ss) to UTC (HH:mm)
-export function istTimeToUtcHHmm(time: string | null | undefined): string {
-    if (!time) return ''
-    const minutes = parseTimeToMinutes(time)
-    if (minutes == null) return ''
-    return minutesToHHmm(minutes - 330)
+    const segments = trimmed.split(':')
+    if (segments.length >= 2) {
+        const h = Number(segments[0])
+        const m = Number(segments[1])
+        if (!Number.isNaN(h) && !Number.isNaN(m)) {
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+        }
+    }
+    return ''
 }
 
 export function formatNumber(num: number): string {

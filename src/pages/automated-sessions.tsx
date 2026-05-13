@@ -36,7 +36,7 @@ import {
 } from '@/lib/automated-sessions'
 import { AutomatedSessionRuleForm } from '@/components/automated-sessions/rule-form'
 import { RuleActions } from '@/components/automated-sessions/rule-actions'
-import { formatDate, utcTimeToIstHHmm } from '@/lib/utils'
+import { automatedRuleTimeToInputHHmm, formatDate } from '@/lib/utils'
 
 type FilterStatus = 'all' | 'active' | 'paused'
 
@@ -167,6 +167,7 @@ export function AutomatedSessionsPage() {
 
     const openEditModal = async (rule: AutomatedSessionRule) => {
         setFormApiErrors({})
+        setEditingRule(rule)
         setIsModalOpen(true)
         try {
             const fresh = await automatedSessionsService.getRule(rule.id)
@@ -295,7 +296,7 @@ export function AutomatedSessionsPage() {
                                                     return (
                                                 <TableRow key={rule.id}>
                                                     <TableCell className="font-medium text-slate-900">{rule.title}</TableCell>
-                                                    <TableCell>{utcTimeToIstHHmm(rule.start_time)} - {utcTimeToIstHHmm(rule.end_time)}</TableCell>
+                                                    <TableCell>{automatedRuleTimeToInputHHmm(rule.start_time)} - {automatedRuleTimeToInputHHmm(rule.end_time)}</TableCell>
                                                     <TableCell>{formatDate(rule.starts_on)}</TableCell>
                                                     <TableCell>{rule.ends_on ? formatDate(rule.ends_on) : 'No end date'}</TableCell>
                                                     <TableCell>
@@ -371,7 +372,7 @@ export function AutomatedSessionsPage() {
                                                 <div>
                                                     <h3 className="font-medium text-slate-900">{rule.title}</h3>
                                                     <p className="text-sm text-slate-600">
-                                                        {utcTimeToIstHHmm(rule.start_time)} - {utcTimeToIstHHmm(rule.end_time)}
+                                                        {automatedRuleTimeToInputHHmm(rule.start_time)} - {automatedRuleTimeToInputHHmm(rule.end_time)}
                                                     </p>
                                                 </div>
                                                 <Badge variant={rule.is_active ? 'default' : 'secondary'}>

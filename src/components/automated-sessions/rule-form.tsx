@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import type { AutomatedSessionRule, CreateAutomatedSessionRuleData } from '@/lib/automated-sessions'
-import { istTimeToUtcHHmm, utcTimeToIstHHmm } from '@/lib/utils'
+import { automatedRuleTimeToInputHHmm } from '@/lib/utils'
 
 interface AutomatedSessionRuleFormProps {
     rule?: AutomatedSessionRule
@@ -43,8 +43,8 @@ export function AutomatedSessionRuleForm({
 }: AutomatedSessionRuleFormProps) {
     const [formData, setFormData] = useState<CreateAutomatedSessionRuleData>({
         title: rule?.title ?? '',
-        start_time: utcTimeToIstHHmm(rule?.start_time) || '06:00',
-        end_time: utcTimeToIstHHmm(rule?.end_time) || '07:00',
+        start_time: automatedRuleTimeToInputHHmm(rule?.start_time) || '06:00',
+        end_time: automatedRuleTimeToInputHHmm(rule?.end_time) || '07:00',
         starts_on: toInputDate(rule?.starts_on),
         ends_on: toInputDate(rule?.ends_on) || null,
         is_active: rule?.is_active ?? true,
@@ -54,14 +54,22 @@ export function AutomatedSessionRuleForm({
     useEffect(() => {
         setFormData({
             title: rule?.title ?? '',
-            start_time: utcTimeToIstHHmm(rule?.start_time) || '06:00',
-            end_time: utcTimeToIstHHmm(rule?.end_time) || '07:00',
+            start_time: automatedRuleTimeToInputHHmm(rule?.start_time) || '06:00',
+            end_time: automatedRuleTimeToInputHHmm(rule?.end_time) || '07:00',
             starts_on: toInputDate(rule?.starts_on),
             ends_on: toInputDate(rule?.ends_on) || null,
             is_active: rule?.is_active ?? true,
         })
         setLocalErrors({})
-    }, [rule])
+    }, [
+        rule?.id,
+        rule?.start_time,
+        rule?.end_time,
+        rule?.title,
+        rule?.starts_on,
+        rule?.ends_on,
+        rule?.is_active,
+    ])
 
     const normalizedErrors = useMemo(
         () => ({
@@ -94,8 +102,6 @@ export function AutomatedSessionRuleForm({
 
         const payload = {
             ...formData,
-            start_time: istTimeToUtcHHmm(formData.start_time),
-            end_time: istTimeToUtcHHmm(formData.end_time),
             ends_on: formData.ends_on || null,
         }
         onSubmit(payload)
